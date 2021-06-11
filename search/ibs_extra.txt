@@ -1,0 +1,317 @@
+import os.path
+
+from collections import OrderedDict
+
+domain = "sliding tiles"
+filename = "1542"
+
+if domain == "blocksworld":
+    
+    folder = "Blocks_world_puzzles/"
+
+    from blocksworld6 import read_file
+    
+    from blocksworld6 import State
+    
+    # from blocksworld6 import transform
+
+elif domain == "sliding tiles":
+    
+    folder = "8_puzzles/8_puzzles/"
+    
+    from temp2 import State
+
+    from temp2 import read_file
+
+from ediHeap_ibs import IHeap
+
+
+class Node:
+
+    def __init__(self, state, g, parent):
+        self.state = state
+        self.h = state.heuristic()
+        self.g = g
+        self.f = g + self.h
+        self.parent = parent
+        # could store level, but I don't see a point
+
+    def __le__(self, b):
+        return self.f < b.f or self.f == b.f and self.h < b.h
+
+    def __gt__(self, b):
+        return self.f > b.f or self.f == b.f and self.h > b.h
+
+    def __eq__ (self, b):
+        return self.state.key() == b.state.key()
+
+    def __hash__(self):
+        return hash(str(self.return_key()))
+
+    def return_key(self):
+        return str(self.state.key())
+
+    def print_backwards_path(self):
+        self.state.print_information()
+        if not self.parent:
+            return
+        self.parent.print_backwards_path()
+
+    def print_path(self, thelist):
+        self.collect_path(thelist)
+        print("Directions:")
+        for i in range(len(thelist)):
+            index = -1 * (i + 1)
+            if thelist[index] == "l":
+                print ("left")
+            if thelist[index] == "r":
+                print ("right")
+            if thelist[index] == "u":
+                print ("up")
+            if thelist[index] == "d":
+                print ("down")
+
+    def print_path_j (self, thelist):
+        self.collect_path (thelist)
+        print("Directions:")
+        for i in range(len(thelist)):
+            index = -1 * (i + 1)
+            if thelist[index] == "l":
+                print ("左")
+            if thelist[index] == "r":
+                print ("右")
+            if thelist[index] == "u":
+                print ("上")
+            if thelist[index] == "d":
+                print ("下")
+
+    def print_path_a (self, thelist):
+        self.collect_path (thelist)
+        print("Directions:")
+        for i in range(len(thelist)):
+            index = -1 * (i + 1)
+            if thelist[index] == "l":
+                print ("←")
+            if thelist[index] == "r":
+                print ("→")
+            if thelist[index] == "u":
+                print ("↑")
+            if thelist[index] == "d":
+                print ("↓")
+    """
+    def collect_path (self, thelist):
+        if not self.state._ntype:
+            return
+        thelist.append(self.state._ntype)
+        self.parent.collect_path(thelist)
+    """
+    
+class RNode:
+
+    def __init__(self, state, g, parent):
+        self.state = state
+        self.h = state.heuristic()
+        self.g = g
+        self.f = g + self.h
+        self.parent = parent
+        # could store level, but I don't see a point
+
+    def __le__(self, b):
+        return self.f > b.f or self.f == b.f and self.h > b.h
+
+    def __gt__(self, b):
+        return self.f < b.f or self.f == b.f and self.h < b.h
+
+    def __eq__ (self, b):
+        return self.state.key() == b.state.key()
+
+    def __hash__(self):
+        return hash(str(self.return_key()))
+
+    def return_key(self):
+        return str(self.state.key())
+
+    def print_backwards_path(self):
+        self.state.print_information()
+        if not self.parent:
+            return
+        self.parent.print_backwards_path()
+
+    def print_path(self, thelist):
+        self.collect_path(thelist)
+        print("Directions:")
+        for i in range(len(thelist)):
+            index = -1 * (i + 1)
+            if thelist[index] == "l":
+                print ("left")
+            if thelist[index] == "r":
+                print ("right")
+            if thelist[index] == "u":
+                print ("up")
+            if thelist[index] == "d":
+                print ("down")
+
+    def print_path_j (self, thelist):
+        self.collect_path (thelist)
+        print("Directions:")
+        for i in range(len(thelist)):
+            index = -1 * (i + 1)
+            if thelist[index] == "l":
+                print ("左")
+            if thelist[index] == "r":
+                print ("右")
+            if thelist[index] == "u":
+                print ("上")
+            if thelist[index] == "d":
+                print ("下")
+
+    def print_path_a (self, thelist):
+        self.collect_path (thelist)
+        print("Directions:")
+        for i in range(len(thelist)):
+            index = -1 * (i + 1)
+            if thelist[index] == "l":
+                print ("←")
+            if thelist[index] == "r":
+                print ("→")
+            if thelist[index] == "u":
+                print ("↑")
+            if thelist[index] == "d":
+                print ("↓")
+    """
+    def collect_path (self, thelist):
+        if not self.state._ntype:
+            return
+        thelist.append(self.state._ntype)
+        self.parent.collect_path(thelist)
+    """
+    
+def convertNode(node):
+    rNode = RNode(node.state, node.g, node.parent)
+    return rNode
+
+def gen_move_children(current, actBW, waitBW, openlist, ropenlist, 
+    waitlist, rwaitlist, closedlist, dep, mdepth):
+    genc = 0
+    if dep == mdepth-1:
+        return genc
+    childcollect = current.state.create_children ()
+    for child in childcollect:
+        print("Number of children is " + str(len(childcollect)))
+        c = Node (child, current.g + 1, current)
+        inlist = False
+        for i in range(mdepth):
+            if c in openlist[i]:
+                print("Hello")
+                if c.g < openlist[i][c].g:
+                    openlist[i].remove(c)
+                    ropenlist[i].remove(convertNode(c))
+                    openlist[dep+1].push(c)
+                    ropenlist[dep+1].push(convertNode(c))
+                inlist = True
+                break
+            if c.return_key() in closedlist[i]:
+                print("Hi")
+                if c.g < closedlist[i][c.return_key()].g:
+                    closedlist[i].pop(c.return_key())
+                    openlist[dep+1].push(c)
+                    ropenlist[dep+1].push(convertNode(c))
+                inlist = True
+                break
+        if inlist == False:
+            genc += 1
+            openlist[dep+1].push(c)
+            ropenlist[dep+1].push(c)
+        if len(openlist[dep+1]) + len(closedlist[dep+1]) > actBW:
+            if closedlist[dep+1]:
+                transfer = openlist[dep+1].pop()
+                ropenlist[dep+1].remove(convertNode(transfer))
+                waitlist[dep+1].push(transfer)
+                rwaitlist[dep+1].push(convertNode(transfer))
+                if len(waitlist[dep+1]) > waitBW:
+                    removed = waitlist[dep+1].pop()
+                    rwaitlist[dep+1].remove(convertNode(removed))
+                else:
+                    print(closedlist[dep+1].keys())
+                    closedlist[dep+1].popitem()
+                    #end of child generation code
+        print("Gencount this time is " + str(genc))
+        return genc
+
+def search_algorithm (startstate, bwidth, mdepth):
+    openlist = [0 for i in range(mdepth)]
+    ropenlist = [0 for i in range(mdepth)]
+    waitlist = [0 for i in range(mdepth)]
+    rwaitlist = [0 for i in range(mdepth)]
+    closedlist = [0 for i in range(mdepth)] #creates the initial lists of structures
+    for i in range(mdepth):
+        openlist[i] = IHeap([])
+        ropenlist[i] = IHeap([])
+        waitlist[i] = IHeap([])
+        rwaitlist[i] = IHeap([])
+        closedlist[i] = OrderedDict()
+    solution_c = 1000 #substitute for infinity to avoid an unreasonably high number of digits
+    goal = None
+    initial = Node(startstate, 0, None)
+    openlist[0].push(initial)
+    ropenlist[0].push(convertNode(initial))
+    actBW = 1
+    waitBW = bwidth - actBW
+    expandcount = 0
+    gencount = 0
+    while True:
+        for dep in range(mdepth):
+            #print(dep)
+            while openlist[dep]:
+                current = openlist[dep].pop()
+                ropenlist[dep].remove(convertNode(current))
+                if current.h == 0:
+                    if current.f < solution_c:
+                        solution_c = current.f
+                        goal = current
+                    closedlist[dep][current.return_key()] = current
+                    continue
+                gencount += gen_move_children(current, actBW, waitBW, openlist, ropenlist, 
+    waitlist, rwaitlist, closedlist, dep, mdepth)
+                expandcount += 1
+                #print("Active beamwidth is " + str(actBW))
+                if waitBW > 0:
+                    actBW += 1
+                    waitBW -= 1
+                    #print(waitBW)
+                    for dep2 in range(mdepth):
+                        if waitlist[dep2]:
+                            #I cannot see how a duplicate node could get in, so I will not be checking
+                            transfer = waitlist[dep2].pop()
+                            rwaitlist[dep2].remove(convertNode(transfer))
+                            openlist[dep2].push(transfer)
+                            ropenlist[dep2].push(convertNode(transfer))
+                else:
+                    if goal:
+                        print("Done!\n" + "g: " + str(goal.g) + "\n")
+                        goal.state.print_information()
+                    print("Nodes expanded: " + str(expandcount))
+                    print("Nodes generated: " + str(gencount) + "\n")
+                    return
+    """
+    pathlist = []
+    current.print_path_a(pathlist)
+    #current.print_backwards_path()
+    """
+    
+
+
+if __name__=='__main__':
+#if called from the terminal
+    if not os.path.exists("C:/Users/melis/" + folder + filename):
+        print("Is your filename correct?")
+    else:
+        initstate = State (*read_file("C:/Users/melis/"+ folder + filename))
+        #initstate._locationlist = [4, 2, 0, 3, 5, 1, 6, 7, 8]
+        #initstate._locationlist = [3, 1, 2, 0, 4, 5, 6, 7, 8]
+        #initstate._0location = 2
+        #initstate._0location = 3
+        #print(goals)
+        #print(goalstate._upblocks, goalstate._dblocks, goalstate._topspoint)
+        #goalstate.print_information()
+        search_algorithm(initstate, 12, 30)

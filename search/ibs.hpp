@@ -17,14 +17,15 @@ template <class D> struct BeamSearch : public SearchAlgorithm<D> {
 		Oper op, pop;  //op and pop are operators?
 		Cost f, g;
 
-		Node() : openind(-1) {
+		/*constructor for node struct*/
+		Node() : openind(-1) {  //place initially at end?
 		}
 
-		static ClosedEntry<Node, D> &closedentry(Node *n) { //comes from closed list
+		static ClosedEntry<Node, D> &closedentry(Node *n) { //what is this?
 			return n->closedent;
 		}
 
-		static PackedState &key(Node *n) {
+		static PackedState &key(Node *n) { //again, feed in reference to a node
 			return n->state;
 		}
 
@@ -61,7 +62,7 @@ template <class D> struct BeamSearch : public SearchAlgorithm<D> {
 	};
 
 	BeamSearch(int argc, const char *argv[]) :
-		SearchAlgorithm<D>(argc, argv), closed(30000001) {
+		SearchAlgorithm<D>(argc, argv), closed(30000001) { //what is closed here?
 		dropdups = false;
 		for (int i = 0; i < argc; i++) {
 			if (i < argc - 1 && strcmp(argv[i], "-width") == 0)
@@ -82,11 +83,11 @@ template <class D> struct BeamSearch : public SearchAlgorithm<D> {
 
 	void search(D &d, typename D::State &s0) {
 		this->start();
-		closed.init(d);
+		closed.init(d);  //initializes closed list for the domain?
 
-		Node *n0 = init(d, s0);
+		Node *n0 = init(d, s0); //takes domain and start state and initializes node
 		//closed.add(n0);
-		open.push(n0);
+		open.push(n0);  //open and closed both declared at bottom
 
 		int depth = 0; // can set variable to something at same time it's declared
 
@@ -94,7 +95,7 @@ template <class D> struct BeamSearch : public SearchAlgorithm<D> {
 		bool done = false; //declares a boolean done and assigns false (to be changed later)
     
 		while (!open.empty() && !done && !SearchAlgorithm<D>::limit()) {
-			depth++; //was zero above, so will first run at depth 1
+			depth++; //gradually increases depth, as IBS does
       
 			Node **beam = new Node*[width];
 			int c = 0; //begin at index 0
@@ -170,7 +171,7 @@ template <class D> struct BeamSearch : public SearchAlgorithm<D> {
 
 	virtual void output(FILE *out) {  //where does file come from?
 		SearchAlgorithm<D>::output(out);
-		closed.prstats(stdout, "closed ");  //Where is prstats?
+		closed.prstats(stdout, "closed ");  //Where is prstats? (Answer: closedlist.hpp)
 		dfpair(stdout, "open list type", "%s", open.kind());
 		dfpair(stdout, "node size", "%u", sizeof(Node));
 	}
