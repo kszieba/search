@@ -15,7 +15,7 @@ import argparse
 
 from collections import OrderedDict
 
-from ediHeap_ibs_1 import IHeap
+from Heap_with_keys import IHeap
 
 
 class Node:
@@ -314,9 +314,9 @@ if __name__=='__main__':
             #raise Value Error (file could not be found)
         else:
             if arguments.t == "blocksworld":
-                from blocksworld7 import read_file
+                from blocksworld import read_file
             elif arguments.t == "slidingtiles":
-                from temp3 import read_file
+                from slidingtiles import read_file
             data, initstate = read_file("C:/Users/melis/"+ arguments.i)
             print(arguments.i)
             search_algorithm(initstate, data, arguments.w, arguments.d)
