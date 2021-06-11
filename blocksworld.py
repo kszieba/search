@@ -243,10 +243,10 @@ def transform(blocklist):
         
 if __name__=='__main__':        
 #if called from the terminal
-    if not os.path.exists("C:/Users/melis/Blocks_world_puzzles/"+filename):
+    if not os.path.exists("C:/Users/melis/blocksworld_puzzles/"+filename):
         print("Is your filename correct?")
     else: 
-        volume, state = read_file("C:/Users/melis/Blocks_world_puzzles/"+filename)
+        volume, state = read_file("C:/Users/melis/blocksworld_puzzles/"+filename)
         #rint(goals)
         print(volume)
         state2 = State (4, [None, None, None, None], [None, None, None, None])
