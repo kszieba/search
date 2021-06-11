@@ -214,7 +214,7 @@ def gen_move_children(current, actBW, waitBW, openlist,
     #print(len(openlist[dep+1]) + len(closedlist[dep+1]) + len(waitlist[dep+1]))
     return genc
 
-def search_algorithm (startstate, data, bwidth, mdepth):
+def search_algorithm (filename, startstate, data, bwidth, mdepth):
     openlist = [0 for i in range(mdepth * 2)]
     waitlist = [0 for i in range(mdepth * 2)]
     closedlist = [0 for i in range(mdepth)] #creates the initial lists of structures
@@ -268,6 +268,9 @@ def search_algorithm (startstate, data, bwidth, mdepth):
                     transfer = poplast(waitlist, dep2, mdepth, data)
                     push(openlist, dep2, mdepth, transfer, data)
         else:
+            print("File: " + filename)
+            print("Beamwidth: " + str(bwidth))
+            print("Max Depth: " + str(mdepth))
             if goal:
                 print("Done!\n" + "g: " + str(goal.g) + "\n")
                 goal.state.print_information(data)
@@ -276,8 +279,6 @@ def search_algorithm (startstate, data, bwidth, mdepth):
                 print("Beamwidths were:  " + str(beamlist))
             else:
                 print("Search was unsuccessful")
-            print("Beamwidth: " + str(bwidth))
-            print("Max Depth: " + str(mdepth))
             print("Nodes expanded: " + str(expandcount))
             print("Distinct nodes generated: " + str(gencount) + "\n")
             """
@@ -319,4 +320,4 @@ if __name__=='__main__':
                 from slidingtiles import read_file
             data, initstate = read_file("C:/Users/melis/"+ arguments.i)
             print(arguments.i)
-            search_algorithm(initstate, data, arguments.w, arguments.d)
+            search_algorithm(arguments.i, initstate, data, arguments.w, arguments.d)
