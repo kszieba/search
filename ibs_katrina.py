@@ -265,7 +265,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
             for dep2 in range(solution_c):
                 if waitlist[dep2]:
                     #I cannot see how a duplicate node could get in, so I will not be checking
-                    transfer = poplast(waitlist, dep2, mdepth, data)
+                    transfer = popfirst(waitlist, dep2, mdepth)
                     push(openlist, dep2, mdepth, transfer, data)
         else:
             print("File: " + filename)
