@@ -159,7 +159,7 @@ def remove(listset, depth, mdepth, node):
     listset[depth + mdepth].remove(node)
 
 def gen_move_children(current, actBW, waitBW, openlist,
-    waitlist, closedlist, dep, mdepth, solution_c, data):
+    waitlist, closedlist, dep, mdepth, solution_c, data, expandcount):
     #print("Depth is " + str(dep))
     genc = 0
     if dep == mdepth-1:
@@ -176,24 +176,56 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 if c.g < openlist[i][c].g:
                     remove (openlist, i, mdepth, c)
                     push (openlist, dep+1, mdepth, c, data)
+                    """
+                    if dep == 6 and expandcount < 300:
+                    #if expandcount == 221:
+                        print (c.key)
+                        print("f: " + str(c.f))
+                        print(1, expandcount)
+                        print("\n")
+                        """
                 inlist = True
                 break
             if c in waitlist[i]:
                 if c.g < waitlist[i][c].g:
                     remove (waitlist, i, mdepth, c)
                     push (openlist, dep+1, mdepth, c, data)
+                    """
+                    if dep == 6 and expandcount < 300:
+                    #if expandcount == 221:
+                        print (c.key)
+                        print("f: " + str(c.f))
+                        print(2, expandcount)
+                        print("\n")
+                        """
                 inlist = True
             if c.key in closedlist[i]:
                 #print("Hi")
                 if c.g < closedlist[i][c.key].g:
                     closedlist[i].pop(c.key)
                     push (openlist, dep+1, mdepth, c, data)
+                    """
+                    if dep == 6 and expandcount < 300:
+                    #if expandcount == 221:
+                        print (c.key)
+                        print("f: " + str(c.f))
+                        print(3, expandcount)
+                        print("\n")
+                        """
                 inlist = True
                 break
         if not inlist:
             #print("Hello?")
             genc += 1
             push (openlist, dep+1, mdepth, c, data)
+            """
+            if dep == 6 and expandcount < 300:
+            #if expandcount == 221:
+                print (c.key)
+                print("f: " + str(c.f))
+                print(4, expandcount)
+                print("\n")
+                """
         #print(inlist)
         #if len(openlist[dep+1]) + len(closedlist[dep+1])-actBW
         if len(openlist[dep+1]) + len(closedlist[dep+1]) > actBW: #corresponds to 10  #using while here
@@ -239,6 +271,8 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, finalwidth):
         for dep in range(solution_c):
             #print(dep)
             while openlist[dep]:
+                #if expandcount == 223:
+                    #print (openlist[dep+1].dct.keys())
                 current = popfirst (openlist, dep, mdepth)
                 #print(current.h)
                 if current.h == 0:
@@ -253,11 +287,11 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, finalwidth):
                     continue
                 closedlist[dep][current.key] = current
                 gencount += gen_move_children(current, actBW, waitBW, openlist,
-    waitlist, closedlist, dep, mdepth, solution_c, data)
+    waitlist, closedlist, dep, mdepth, solution_c, data, expandcount)
                 if actBW < finalwidth + 1:
                     print(current.key)
-                    print("Active beamwidth was " + str(actBW))
-                    print("Depth was " + str(dep))
+                    print ("f-value is " + str(current.f))
+                    print("Depth is ", str(dep))
                 expandcount += 1
                 #print(closedlist[dep])
                 #print("Closed list length is " + str(len(closedlist[dep])))
@@ -269,18 +303,27 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, finalwidth):
             for dep2 in range(solution_c):
                 if waitlist[dep2]:
                     #I cannot see how a duplicate node could get in, so I will not be checking
-                    transfer = poplast(waitlist, dep2, mdepth, data)
+                    transfer = popfirst(waitlist, dep2, mdepth)
                     push(openlist, dep2, mdepth, transfer, data)
+                    """
+                    if dep2 == 7 and expandcount < 300:
+                    #if expandcount == 221:
+                        print (transfer.key)
+                        print("f: " + str(transfer.f))
+                        print(5, expandcount)
+                        print("\n")
+                    """
         else:
             #print("File: " + filename)
             #print("Beamwidth: " + str(bwidth))
             #print("Max Depth: " + str(mdepth))
             if goal:
                 #print("Done!\n" + "g: " + str(goal.g) + "\n")
-                goal.state.print_information(data)
+                #goal.state.print_information(data)
                 #print("Total goal count: " + str(goalcount))
                 #print ("Costs were: " + str(countlist))
                 #print("Beamwidths were:  " + str(beamlist))
+                return
             else:
                 #print("Search was unsuccessful")
             #print("Nodes expanded: " + str(expandcount))
