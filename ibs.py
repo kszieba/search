@@ -14,7 +14,7 @@ import argparse
 
 from collections import OrderedDict
 
-from Heap_with_keys import IHeap
+from heap_with_keys import Heap_with_keys
 
 from red_black_tree import RedBlackTree
 
@@ -246,8 +246,8 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
     waitlist = [0 for i in range(mdepth)]
     closedlist = [0 for i in range(mdepth)] #creates the initial lists of structures
     for i in range(mdepth):
-        openlist[i] = IHeap([])
-        openlist[i + mdepth] = IHeap([])
+        openlist[i] = Heap_with_keys([])
+        openlist[i + mdepth] = Heap_with_keys([])
         waitlist[i] = RedBlackTree()
         closedlist[i] = OrderedDict()   #correspond to line 3
     solution_c = mdepth #substitute for infinity to avoid an unreasonably high number of digits

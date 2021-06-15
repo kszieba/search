@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-
+This heap does not work with duplicates and can be expected to react badly to 
+them. However, it works well for handling two types of nodes used to form
+pairs.
 """
 
 def parent(i):
@@ -12,7 +14,7 @@ def left(i):
 def right(i):
     return 2*i+2
 
-class IHeap:
+class Heap_with_keys:
     def __init__(self, alist):
         self.alist = [alist]
         self.n = len(alist)
