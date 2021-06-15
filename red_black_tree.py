@@ -5,6 +5,12 @@
 
 #edited
 
+"""
+This red-black tree allows inserting, popping the max, and popping the min. It
+is not intended for searching beyond that. It is also capable of retaining
+duplicates and returning them when appropriate.
+"""
+
 import sys
 
 # data structure that represents a node in the tree
@@ -324,6 +330,8 @@ class RedBlackTree():
         return self.root == self.TNULL
 
 if __name__ == "__main__":
+
+#junk class is a class used for testing. It is not intended to hold actual values.
 
     class junk:
         def __init__(self, h, g, state=0):
