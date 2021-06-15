@@ -218,16 +218,13 @@ def gen_move_children(current, actBW, waitBW, openlist,
             #print("Hello?")
             push (openlist, dep+1, mdepth, c, data)
         #print(inlist)
-        #if len(openlist[dep+1]) + len(closedlist[dep+1])-actBW
-        if len(openlist[dep+1]) + len(closedlist[dep+1]) > actBW:
+        #if len(openlist[dep+1]) + len(closedlist[dep+1]) > actBW:
+        if len(openlist[dep+1]) > actBW:
             #print("Hi")
-            if not closedlist[dep+1]:
-                transfer = poplast(openlist, dep+1, mdepth, data)
-                push (waitlist, dep+1, mdepth, transfer, data)
-                if len(waitlist[dep+1]) > waitBW:
-                    poplast(waitlist, dep+1, mdepth, data)
-            else:
-                closedlist[dep+1].popitem(last=False)
+            transfer = poplast(openlist, dep+1, mdepth, data)
+            push (waitlist, dep+1, mdepth, transfer, data)
+            if len(waitlist[dep+1]) > waitBW:
+                poplast(waitlist, dep+1, mdepth, data)
                 #end of child generation code
     """
     if closedlist[dep+1]:
