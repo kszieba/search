@@ -17,6 +17,8 @@ from collections import OrderedDict
 
 from Heap_with_keys import IHeap
 
+from red_black_tree import RedBlackTree
+
 
 class Node:
 
@@ -29,11 +31,17 @@ class Node:
         self.key = str(self.state.key())
         # could store level, but I don't see a point
 
+    def __lt__(self, b):
+        return self.f < b.f or (self.f == b.f and self.h < b.h)
+    
     def __le__(self, b):
-        return self.f < b.f or self.f == b.f and self.h < b.h
+        return self < b or (self.f == b.f and self.h == b.h)
 
     def __gt__(self, b):
-        return self.f > b.f or self.f == b.f and self.h > b.h
+        return self.f > b.f or (self.f == b.f and self.h > b.h)
+    
+    def __ge___(self, b):
+        return self > b or (self.f == b.f and self.h == b.h)
 
     def __eq__ (self, b):
         return self.key == b.key
@@ -110,11 +118,17 @@ class RNode:
         self.key = str(self.state.key())
         # could store level, but I don't see a point
 
-    def __le__(self, b):
-        return self.f > b.f or self.f == b.f and self.h > b.h
+    def __lt__(self, b):
+        return self.f > b.f or (self.f == b.f and self.h > b.h)
 
     def __gt__(self, b):
-        return self.f < b.f or self.f == b.f and self.h < b.h
+        return self.f < b.f or (self.f == b.f and self.h < b.h)
+    
+    def __le__(self, b):
+        return self < b or (self.f == b.f and self.h == b.h)
+
+    def __ge__(self, b):
+        return self > b or (self.f == b.f and self.h == b.h)
 
     def __eq__ (self, b):
         return self.key == b.key
@@ -141,17 +155,29 @@ def convertfromRNode(node, data):
     return sNode
 
 def push(listset, depth, mdepth, node, data):
-    listset[depth].push(node)
-    listset[depth + mdepth].push(convertfromSNode(node, data))
+    if type(listset[depth]) != RedBlackTree:
+        #print("Hello, push")
+        #print(node.key)
+        listset[depth].push(node)
+        #print(depth + mdepth)
+        listset[depth + mdepth].push(convertfromSNode(node, data))
+    else:
+        listset[depth].insert(node)
 
 def popfirst(listset, depth, mdepth):
-    node = listset[depth].pop()
-    listset[depth + mdepth].remove(node)
+    if type(listset[depth]) != RedBlackTree:
+        node = listset[depth].pop()
+        listset[depth + mdepth].remove(node)
+    else:
+        node = listset[depth].pop_min()
     return node
-
+        
 def poplast(listset, depth, mdepth, data):
-    node = convertfromRNode(listset[depth + mdepth].pop(), data)
-    listset[depth].remove(node)
+    if type(listset[depth]) != RedBlackTree:
+        node = convertfromRNode(listset[depth + mdepth].pop(), data)
+        listset[depth].remove(node)
+    else:
+        node = listset[depth].pop_max()
     return node
 
 def remove(listset, depth, mdepth, node):
@@ -159,7 +185,7 @@ def remove(listset, depth, mdepth, node):
     listset[depth + mdepth].remove(node)
 
 def gen_move_children(current, actBW, waitBW, openlist,
-    waitlist, closedlist, dep, mdepth, solution_c, data, expandcount):
+    waitlist, closedlist, dep, mdepth, solution_c, data):
     #print("Depth is " + str(dep))
     genc = 0
     if dep == mdepth-1:
@@ -169,67 +195,31 @@ def gen_move_children(current, actBW, waitBW, openlist,
     for i in range(len(childcollect)):
         #print(i)
         c = Node (childcollect[i], current.g + 1, current, data)
+        genc += 1
         inlist = False
-        for i in range(mdepth): #altering this has serious effects
+        if c.f > solution_c:
+            continue
+        for i in range(solution_c):
             if c in openlist[i]:
                 #print("Hello")
                 if c.g < openlist[i][c].g:
                     remove (openlist, i, mdepth, c)
                     push (openlist, dep+1, mdepth, c, data)
-                    """
-                    if dep == 6 and expandcount < 300:
-                    #if expandcount == 221:
-                        print (c.key)
-                        print("f: " + str(c.f))
-                        print(1, expandcount)
-                        print("\n")
-                        """
                 inlist = True
                 break
-            if c in waitlist[i]:
-                if c.g < waitlist[i][c].g:
-                    remove (waitlist, i, mdepth, c)
-                    push (openlist, dep+1, mdepth, c, data)
-                    """
-                    if dep == 6 and expandcount < 300:
-                    #if expandcount == 221:
-                        print (c.key)
-                        print("f: " + str(c.f))
-                        print(2, expandcount)
-                        print("\n")
-                        """
-                inlist = True
             if c.key in closedlist[i]:
                 #print("Hi")
                 if c.g < closedlist[i][c.key].g:
                     closedlist[i].pop(c.key)
                     push (openlist, dep+1, mdepth, c, data)
-                    """
-                    if dep == 6 and expandcount < 300:
-                    #if expandcount == 221:
-                        print (c.key)
-                        print("f: " + str(c.f))
-                        print(3, expandcount)
-                        print("\n")
-                        """
                 inlist = True
                 break
         if not inlist:
             #print("Hello?")
-            genc += 1
             push (openlist, dep+1, mdepth, c, data)
-            """
-            if dep == 6 and expandcount < 300:
-            #if expandcount == 221:
-                print (c.key)
-                print("f: " + str(c.f))
-                print(4, expandcount)
-                print("\n")
-                """
         #print(inlist)
         #if len(openlist[dep+1]) + len(closedlist[dep+1])-actBW
-        if len(openlist[dep+1]) + len(closedlist[dep+1]) > actBW: #corresponds to 10  #using while here
-        #reduces active beam width to acceptable range, but doesn't fix the mismatch
+        if len(openlist[dep+1]) + len(closedlist[dep+1]) > actBW:
             #print("Hi")
             if not closedlist[dep+1]:
                 transfer = poplast(openlist, dep+1, mdepth, data)
@@ -237,24 +227,24 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 if len(waitlist[dep+1]) > waitBW:
                     poplast(waitlist, dep+1, mdepth, data)
             else:
-                #print("Closed list length is " + str(len(closedlist[dep+1])))
-                closedlist[dep+1].popitem()
-                #print("Closed list length is now " + str(len(closedlist[dep+1])))
+                closedlist[dep+1].popitem(last=False)
                 #end of child generation code
-    #print("Gencount this time is " + str(genc))
-    #print(len(openlist[dep+1]), actBW)
-    #print(len(openlist[dep+1]) + len(closedlist[dep+1]) + len(waitlist[dep+1]))
+    """
+    if closedlist[dep+1]:
+        print("Active beamwidth is " + str(actBW))
+        print(dep+1)
+        print("Length of closed list is " + str(len(closedlist[dep+1])))
+        """
     return genc
 
-def search_algorithm (filename, startstate, data, bwidth, mdepth, finalwidth):
+def search_algorithm (filename, startstate, data, bwidth, mdepth):
     openlist = [0 for i in range(mdepth * 2)]
-    waitlist = [0 for i in range(mdepth * 2)]
+    waitlist = [0 for i in range(mdepth)]
     closedlist = [0 for i in range(mdepth)] #creates the initial lists of structures
     for i in range(mdepth):
         openlist[i] = IHeap([])
         openlist[i + mdepth] = IHeap([])
-        waitlist[i] = IHeap([])
-        waitlist[i + mdepth] = IHeap([])
+        waitlist[i] = RedBlackTree()
         closedlist[i] = OrderedDict()   #correspond to line 3
     solution_c = mdepth #substitute for infinity to avoid an unreasonably high number of digits
     goal = None
@@ -271,8 +261,6 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, finalwidth):
         for dep in range(solution_c):
             #print(dep)
             while openlist[dep]:
-                #if expandcount == 223:
-                    #print (openlist[dep+1].dct.keys())
                 current = popfirst (openlist, dep, mdepth)
                 #print(current.h)
                 if current.h == 0:
@@ -287,11 +275,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, finalwidth):
                     continue
                 closedlist[dep][current.key] = current
                 gencount += gen_move_children(current, actBW, waitBW, openlist,
-    waitlist, closedlist, dep, mdepth, solution_c, data, expandcount)
-                if actBW < finalwidth + 1:
-                    print(current.key)
-                    print ("f-value is " + str(current.f))
-                    print("Depth is ", str(dep))
+    waitlist, closedlist, dep, mdepth, solution_c, data)
                 expandcount += 1
                 #print(closedlist[dep])
                 #print("Closed list length is " + str(len(closedlist[dep])))
@@ -302,38 +286,43 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, finalwidth):
             #print(waitBW)
             for dep2 in range(solution_c):
                 if waitlist[dep2]:
-                    #I cannot see how a duplicate node could get in, so I will not be checking
                     transfer = popfirst(waitlist, dep2, mdepth)
-                    push(openlist, dep2, mdepth, transfer, data)
-                    """
-                    if dep2 == 7 and expandcount < 300:
-                    #if expandcount == 221:
-                        print (transfer.key)
-                        print("f: " + str(transfer.f))
-                        print(5, expandcount)
-                        print("\n")
-                    """
+                    inlist = False
+                    for i in range(mdepth): #altering this has serious effects
+                        if transfer in openlist[i]:
+                            if transfer.g < openlist[i][transfer].g:
+                                remove (openlist, i, mdepth, transfer)
+                                push (openlist, dep+1, mdepth, transfer, data)
+                            inlist = True
+                            break
+                        if transfer.key in closedlist[i]:
+                            if transfer.g < closedlist[i][transfer.key].g:
+                                closedlist[i].pop(transfer.key)
+                                push (openlist, dep2+1, mdepth, transfer, data)
+                            inlist = True
+                            break
+                    if not inlist:
+                        push(openlist, dep2, mdepth, transfer, data)
         else:
-            #print("File: " + filename)
-            #print("Beamwidth: " + str(bwidth))
-            #print("Max Depth: " + str(mdepth))
+            print("File: " + filename)
+            print("Beamwidth: " + str(bwidth))
+            print("Max Depth: " + str(mdepth))
             if goal:
-                #print("Done!\n" + "g: " + str(goal.g) + "\n")
-                #goal.state.print_information(data)
-                #print("Total goal count: " + str(goalcount))
-                #print ("Costs were: " + str(countlist))
-                #print("Beamwidths were:  " + str(beamlist))
-                return
+                print("Done!\n" + "g: " + str(goal.g) + "\n")
+                goal.state.print_information(data)
+                print("Total goal count: " + str(goalcount))
+                print ("Costs were: " + str(countlist))
+                print("Beamwidths were:  " + str(beamlist))
             else:
-                #print("Search was unsuccessful")
-            #print("Nodes expanded: " + str(expandcount))
-            #print("Distinct nodes generated: " + str(gencount) + "\n")
-                """
+                print("Search was unsuccessful")
+            print("Nodes expanded: " + str(expandcount))
+            print("Distinct nodes generated: " + str(gencount) + "\n")
+            """
             for i in range(len(openlist)):
                 print("For " + str(i))
                 for key in openlist[i].dct.keys():
                     print(type(key))
-                    """
+            """
             
             return
     """
@@ -351,7 +340,6 @@ if __name__=='__main__':
     PARSE.add_argument("-t", help='type of domain in lowercase', type=str)
     PARSE.add_argument("-w", help='beam width', type=int)
     PARSE.add_argument("-d", help='maximum depth', type=int)
-    PARSE.add_argument("-f", help='final printing width', type=int)
     arguments = PARSE.parse_args()
     #parses arguments
     if not arguments.i:
@@ -368,4 +356,4 @@ if __name__=='__main__':
                 from slidingtiles import read_file
             data, initstate = read_file("C:/Users/melis/"+ arguments.i)
             print(arguments.i)
-            search_algorithm(arguments.i, initstate, data, arguments.w, arguments.d, arguments.f)
+            search_algorithm(arguments.i, initstate, data, arguments.w, arguments.d)
