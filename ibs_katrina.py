@@ -199,7 +199,7 @@ def gen_move_children(current, actBW, waitBW, openlist,
         inlist = False
         if c.f > solution_c:
             continue
-        for i in range(mdepth): #altering this has serious effects
+        for i in range(solution_c):
             if c in openlist[i]:
                 #print("Hello")
                 if c.g < openlist[i][c].g:
