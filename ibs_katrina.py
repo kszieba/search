@@ -195,7 +195,10 @@ def gen_move_children(current, actBW, waitBW, openlist,
     for i in range(len(childcollect)):
         #print(i)
         c = Node (childcollect[i], current.g + 1, current, data)
+        genc += 1
         inlist = False
+        if c.f > solution_c:
+            continue
         for i in range(mdepth): #altering this has serious effects
             if c in openlist[i]:
                 #print("Hello")
@@ -213,7 +216,6 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 break
         if not inlist:
             #print("Hello?")
-            genc += 1
             push (openlist, dep+1, mdepth, c, data)
         #print(inlist)
         #if len(openlist[dep+1]) + len(closedlist[dep+1])-actBW
