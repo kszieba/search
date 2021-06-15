@@ -180,11 +180,8 @@ def poplast(listset, depth, mdepth, data):
     return node
 
 def remove(listset, depth, mdepth, node):
-    if type(listset[depth]) != RedBlackTree:
-        listset[depth].remove(node)
-        listset[depth + mdepth].remove(node)
-    else:
-        print("Alert!")
+    listset[depth].remove(node)
+    listset[depth + mdepth].remove(node)
 
 def gen_move_children(current, actBW, waitBW, openlist,
     waitlist, closedlist, dep, mdepth, solution_c, data):
@@ -246,7 +243,7 @@ def gen_move_children(current, actBW, waitBW, openlist,
 
 def search_algorithm (filename, startstate, data, bwidth, mdepth):
     openlist = [0 for i in range(mdepth * 2)]
-    waitlist = [0 for i in range(mdepth * 2)]
+    waitlist = [0 for i in range(mdepth)]
     closedlist = [0 for i in range(mdepth)] #creates the initial lists of structures
     for i in range(mdepth):
         openlist[i] = IHeap([])
