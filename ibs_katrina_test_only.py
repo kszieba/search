@@ -3,7 +3,8 @@
 Incremental Beam Search Algorithm
 
 This version assumes cost is constant and does not explore deeper levels than
-the one where the current best solution was found.
+the one where the current best solution was found. This particular file is
+intended for testing and debugging. (Currently, it keeps a full closed list)
 
 Created on Tue Jun  8 13:47:52 2021
 
