@@ -54,7 +54,7 @@ def test_algorithm(algorithm, size, giventype, parameter, domain):
         if domain == "blocksworld" or domain == None:
             for name in nameset:
                 data, initstate = blocksworld.read_file("C:/Users/melis/blocksworld_puzzles/blocks" + name +".txt")
-                filename = "Blocks_world_puzzles/" + name
+                filename = "Blocks_world_puzzles/blocks" + name + "txt"
                 for beam in range(beamstart, beamstop, 20):
                     for depth in range(depthstart, depthstop, 10):
                         algor.search_algorithm(filename, initstate, data, beam, depth)
