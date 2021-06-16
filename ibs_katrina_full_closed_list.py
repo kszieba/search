@@ -3,17 +3,20 @@
 Incremental Beam Search Algorithm
 This version assumes cost is constant and does not explore deeper levels than
 the one where the current best solution was found.
-the one where the current best solution was found. This particular file is
-intended for testing and debugging. (Currently, it keeps a full closed list)
 Created on Tue Jun  8 13:47:52 2021
 """
 import os.path
 import argparse
+import sys
 from collections import OrderedDict
+
 from heap_with_keys import Heap_with_keys
+
 from red_black_tree import RedBlackTree
 
+
 class Node:
+  
     def __init__(self, state, g, parent, data):
         self.state = state
         self.h = state.heuristic(data)
@@ -22,22 +25,22 @@ class Node:
         self.parent = parent
         self.key = str(self.state.key())
         # could store level, but I don't see a point
-        
+
     def __lt__(self, b):
         return self.f < b.f or (self.f == b.f and self.h < b.h)
-    
+
     def __le__(self, b):
         return self < b or (self.f == b.f and self.h == b.h)
-    
+
     def __gt__(self, b):
         return self.f > b.f or (self.f == b.f and self.h > b.h)
-    
+
     def __ge___(self, b):
         return self > b or (self.f == b.f and self.h == b.h)
-    
+
     def __eq__ (self, b):
         return self.key == b.key
-    
+  
     def __hash__(self):
         return hash(self.key)
     
@@ -49,6 +52,7 @@ class Node:
         if not self.parent:
             return
         self.parent.print_backwards_path()
+        
     def print_path(self, thelist):
         self.collect_path(thelist)
         print("Directions:")
@@ -106,20 +110,22 @@ class RNode:
         self.parent = parent
         self.key = str(self.state.key())
         # could store level, but I don't see a point
+
     def __lt__(self, b):
         return self.f > b.f or (self.f == b.f and self.h > b.h)
+
     def __gt__(self, b):
         return self.f < b.f or (self.f == b.f and self.h < b.h)
-    
+
     def __le__(self, b):
         return self < b or (self.f == b.f and self.h == b.h)
-    
+
     def __ge__(self, b):
         return self > b or (self.f == b.f and self.h == b.h)
-    
+
     def __eq__ (self, b):
         return self.key == b.key
-    
+  
     def __hash__(self):
         return hash(self.key)
     
@@ -149,7 +155,7 @@ def push(listset, depth, mdepth, node, data):
         listset[depth + mdepth].push(convertfromSNode(node, data))
     else:
         listset[depth].insert(node)
-        
+
 def popfirst(listset, depth, mdepth):
     if type(listset[depth]) != RedBlackTree:
         node = listset[depth].pop()
@@ -172,30 +178,50 @@ def remove(listset, depth, mdepth, node):
     
 def gen_move_children(current, actBW, waitBW, openlist,
     waitlist, closedlist, dep, mdepth, solution_c, data):
+    #print("Depth is " + str(dep))
     genc = 0
-    if dep == mdepth-1:
+    if dep == solution_c - 1:
         return genc
     childcollect = current.state.create_children (data)
+    #print("Number of children is " + str(len(childcollect)))
     for i in range(len(childcollect)):
+        #print(i)
         c = Node (childcollect[i], current.g + 1, current, data)
         genc += 1
         inlist = False
-        if c.f >= solution_c:
+        if c.f >= solution_c: #very useful
             continue
-        for i in range(solution_c):
+        for i in range(solution_c): #altering this has serious effects
+            #if c.key == '[3, 0, 4, 16, 6, 17, 12, 9, 5, None, None, 1, 11, None, 15, 7, 13, None]':
+                    #print("Hello1")
             if c in openlist[i]:
                 if c.g < openlist[i][c].g:
+                    """
+                    if c.key == '[3, 0, 4, 16, 6, 17, 12, 9, 5, None, None, 1, 11, None, 15, 7, 13, None]':
+                        print("Hello4")
+                        """
                     remove (openlist, i, mdepth, c)
                     push (openlist, dep+1, mdepth, c, data)
                 inlist = True
                 break
             if c.key in closedlist[i]:
+                """
+                if c.key == '[3, 0, 4, 16, 6, 17, 12, 9, 5, None, None, 1, 11, None, 15, 7, 13, None]':
+                    print("Hello2")
+                    """
                 if c.g < closedlist[i][c.key].g:
                     closedlist[i].pop(c.key)
                     push (openlist, dep+1, mdepth, c, data)
                 inlist = True
                 break
         if not inlist:
+            #print("Hello?")
+            """
+            if c.key == '[3, 0, 4, 16, 6, 17, 12, 9, 5, None, None, 1, 11, None, 15, 7, 13, None]':
+                print("Hello3")
+                """
+            #if solution_c == 29:
+                #print(dep+1, file=sys.stderr)
             push (openlist, dep+1, mdepth, c, data)
         if len(openlist[dep+1]) > actBW:
             transfer = poplast(openlist, dep+1, mdepth, data)
@@ -227,23 +253,37 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
     gencount = 0
     while True:
         for dep in range(solution_c):
+            #print(dep)
             while openlist[dep]:
+                """
+                print(len(openlist[dep]))
+                if len(openlist[dep]) == 2:
+                    print(openlist[dep].alist)
+                    for node in openlist[dep].alist:
+                        print(node.key)
+                        """
                 current = popfirst (openlist, dep, mdepth)
                 if current.f >= solution_c:
                     continue
+                #print(current.h)
                 if current.h == 0:
                     if current.f < solution_c:
                         solution_c = current.f
+                        #print ("Solution cost is " + str(solution_c), file=sys.stderr)
                         goal = current
                         goalcount += 1
                         countlist.append(current.f)
                         beamlist.append(actBW)
                     closedlist[dep][current.key] = current
+                    #print(closedlist[dep])
                     continue
                 closedlist[dep][current.key] = current
                 gencount += gen_move_children(current, actBW, waitBW, openlist,
     waitlist, closedlist, dep, mdepth, solution_c, data)
                 expandcount += 1
+                #print(closedlist[dep])
+                #print("Closed list length is " + str(len(closedlist[dep])))
+                #print("Active beamwidth is " + str(actBW))
         if waitBW > 0:
             actBW += 1
             waitBW -= 1
@@ -251,8 +291,12 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
             for dep2 in range(solution_c):
                 if waitlist[dep2]:
                     transfer = popfirst(waitlist, dep2, mdepth)
+                    """
+                    if transfer.key == '[3, 0, 4, 16, 6, 17, 12, 9, 5, None, None, 1, 11, None, 15, 7, 13, None]':
+                        print("Hello1")
+                        """
                     inlist = False
-                    for i in range(solution_c):
+                    for i in range(solution_c): #altering this has serious effects
                         if transfer in openlist[i]:
                             if transfer.g < openlist[i][transfer].g:
                                 remove (openlist, i, mdepth, transfer)
@@ -281,9 +325,19 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
                 print("Search was unsuccessful")
             print("Nodes expanded: " + str(expandcount))
             print("Distinct nodes generated: " + str(gencount) + "\n")
+            """
+            for i in range(len(openlist)):
+                print("For " + str(i))
+                for key in openlist[i].dct.keys():
+                    print(type(key))
+            """
             
             return
-
+    """
+    pathlist = []
+    current.print_path_a(pathlist)
+    #current.print_backwards_path()
+    """
 if __name__=='__main__':
     PARSE = argparse.ArgumentParser()
     #creates parser
@@ -295,16 +349,18 @@ if __name__=='__main__':
     #parses arguments
     if not arguments.i:
         print("No input file was given.")
+    """
     else:
         if not os.path.exists("C:/Users/melis/" + arguments.i):
         #if file cannot be found
             raise ValueError("File could not be found.")
             #raise Value Error (file could not be found)
         else:
-            if arguments.t == "blocksworld":
-                from blocksworld import read_file
-            elif arguments.t == "slidingtiles":
-                from slidingtiles import read_file
-            data, initstate = read_file("C:/Users/melis/"+ arguments.i)
-            print(arguments.i)
-            search_algorithm(arguments.i, initstate, data, arguments.w, arguments.d)
+    """
+    if arguments.t == "blocksworld":
+        from blocksworld import read_file
+    elif arguments.t == "slidingtiles":
+        from slidingtiles import read_file
+    data, initstate = read_file("C:/Users/melis/"+ arguments.i)
+    print(arguments.i)
+    search_algorithm(arguments.i, initstate, data, arguments.w, arguments.d)
