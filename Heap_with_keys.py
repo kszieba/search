@@ -4,6 +4,7 @@ This heap does not work with duplicates and can be expected to react badly to
 them. However, it works well for handling two types of nodes used to form
 pairs.
 """
+import sys
 
 def parent(i):
     return int((i-1)/2)
@@ -111,6 +112,8 @@ class Heap_with_keys:
         else:
             self.alist.append(node)
         self.n += 1
+        if node.key in self.dct.keys():
+            raise ValueError ("Duplicate was pushed")
         self.dct[node.key] = self.__moveUp__(self.n-1)
         
     def pop(self):
