@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Incremental Beam Search Algorithm
-
 This version assumes cost is constant and does not explore deeper levels than
 the one where the current best solution was found.
-
 Created on Tue Jun  8 13:47:52 2021
-
 """
-
 import os.path
-
 import argparse
 
 from collections import OrderedDict
@@ -19,9 +14,7 @@ from heap_with_keys import Heap_with_keys
 
 from red_black_tree import RedBlackTree
 
-
 class Node:
-
     def __init__(self, state, g, parent, data):
         self.state = state
         self.h = state.heuristic(data)
@@ -30,34 +23,27 @@ class Node:
         self.parent = parent
         self.key = str(self.state.key())
         # could store level, but I don't see a point
-
     def __lt__(self, b):
         return self.f < b.f or (self.f == b.f and self.h < b.h)
     
     def __le__(self, b):
         return self < b or (self.f == b.f and self.h == b.h)
-
     def __gt__(self, b):
         return self.f > b.f or (self.f == b.f and self.h > b.h)
     
     def __ge___(self, b):
         return self > b or (self.f == b.f and self.h == b.h)
-
     def __eq__ (self, b):
         return self.key == b.key
-
     def __hash__(self):
         return hash(self.key)
-
     def return_key(self):
         return self.key
-
     def print_backwards_path(self):
         self.state.print_information()
         if not self.parent:
             return
         self.parent.print_backwards_path()
-
     def print_path(self, thelist):
         self.collect_path(thelist)
         print("Directions:")
@@ -71,7 +57,6 @@ class Node:
                 print ("up")
             if thelist[index] == "d":
                 print ("down")
-
     def print_path_j (self, thelist):
         self.collect_path (thelist)
         print("Directions:")
@@ -85,7 +70,6 @@ class Node:
                 print ("上")
             if thelist[index] == "d":
                 print ("下")
-
     def print_path_a (self, thelist):
         self.collect_path (thelist)
         print("Directions:")
@@ -106,9 +90,7 @@ class Node:
         thelist.append(self.state._ntype)
         self.parent.collect_path(thelist)
     """
-
 class RNode:
-
     def __init__(self, state, g, parent, data):
         self.state = state
         self.h = state.heuristic(data)
@@ -117,43 +99,32 @@ class RNode:
         self.parent = parent
         self.key = str(self.state.key())
         # could store level, but I don't see a point
-
     def __lt__(self, b):
         return self.f > b.f or (self.f == b.f and self.h > b.h)
-
     def __gt__(self, b):
         return self.f < b.f or (self.f == b.f and self.h < b.h)
     
     def __le__(self, b):
         return self < b or (self.f == b.f and self.h == b.h)
-
     def __ge__(self, b):
         return self > b or (self.f == b.f and self.h == b.h)
-
     def __eq__ (self, b):
         return self.key == b.key
-
     def __hash__(self):
         return hash(self.key)
-
     def return_key(self):
         return self.key
-
     def print_backwards_path(self, data):
         self.state.print_information(data)
         if not self.parent:
             return
         self.parent.print_backwards_path(data)
-
-
 def convertfromSNode(node, data):
     rNode = RNode(node.state, node.g, node.parent, data)
     return rNode
-
 def convertfromRNode(node, data):
     sNode = Node(node.state, node.g, node.parent, data)
     return sNode
-
 def push(listset, depth, mdepth, node, data):
     if type(listset[depth]) != RedBlackTree:
         #print("Hello, push")
@@ -163,7 +134,6 @@ def push(listset, depth, mdepth, node, data):
         listset[depth + mdepth].push(convertfromSNode(node, data))
     else:
         listset[depth].insert(node)
-
 def popfirst(listset, depth, mdepth):
     if type(listset[depth]) != RedBlackTree:
         node = listset[depth].pop()
@@ -179,11 +149,9 @@ def poplast(listset, depth, mdepth, data):
     else:
         node = listset[depth].pop_max()
     return node
-
 def remove(listset, depth, mdepth, node):
     listset[depth].remove(node)
     listset[depth + mdepth].remove(node)
-
 def gen_move_children(current, actBW, waitBW, openlist,
     waitlist, closedlist, dep, mdepth, solution_c, data):
     #print("Depth is " + str(dep))
@@ -230,7 +198,6 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 closedlist[dep+1].popitem(last=False)
                 #end of child generation code
     return genc
-
 def search_algorithm (filename, startstate, data, bwidth, mdepth):
     openlist = [0 for i in range(mdepth * 2)]
     waitlist = [0 for i in range(mdepth)]
@@ -324,9 +291,6 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
     current.print_path_a(pathlist)
     #current.print_backwards_path()
     """
-
-
-
 if __name__=='__main__':
     PARSE = argparse.ArgumentParser()
     #creates parser
@@ -338,16 +302,16 @@ if __name__=='__main__':
     #parses arguments
     if not arguments.i:
         print("No input file was given.")
-    else:
-        if not os.path.exists("C:/Users/melis/" + arguments.i):
+    #else:
+        #if not os.path.exists("C:/Users/melis/" + arguments.i):
         #if file cannot be found
-            raise ValueError("File could not be found.")
+            #raise ValueError("File could not be found.")
             #raise Value Error (file could not be found)
-        else:
-            if arguments.t == "blocksworld":
-                from blocksworld import read_file
-            elif arguments.t == "slidingtiles":
-                from slidingtiles import read_file
-            data, initstate = read_file("C:/Users/melis/"+ arguments.i)
-            print(arguments.i)
-            search_algorithm(arguments.i, initstate, data, arguments.w, arguments.d)
+    else:
+        if arguments.t == "blocksworld":
+            from blocksworld import read_file
+        elif arguments.t == "slidingtiles":
+            from slidingtiles import read_file
+        data, initstate = read_file("C:/Users/melis/"+ arguments.i)
+        print(arguments.i)
+        search_algorithm(arguments.i, initstate, data, arguments.w, arguments.d)
