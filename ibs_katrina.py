@@ -346,25 +346,22 @@ if __name__=='__main__':
     PARSE = argparse.ArgumentParser()
     #creates parser
     PARSE.add_argument("-i", help='input file path (shortened)', type=str)
-    PARSE.add_argument("-t", help='type of domain in lowercase', type=str)
+    PARSE.add_argument("-d", help='domain name in lowercase', type=str)
     PARSE.add_argument("-w", help='beam width', type=int)
-    PARSE.add_argument("-d", help='maximum depth', type=int)
+    PARSE.add_argument("-b", help='maximum depth', type=int)
     arguments = PARSE.parse_args()
     #parses arguments
     if not arguments.i:
         print("No input file was given.")
-    """
     else:
         if not os.path.exists("C:/Users/melis/" + arguments.i):
         #if file cannot be found
             raise ValueError("File could not be found.")
             #raise Value Error (file could not be found)
         else:
-    """
-    if arguments.t == "blocksworld":
-        from blocksworld import read_file
-    elif arguments.t == "slidingtiles":
-        from slidingtiles import read_file
-    data, initstate = read_file("C:/Users/melis/"+ arguments.i)
-    print(arguments.i)
-    search_algorithm(arguments.i, initstate, data, arguments.w, arguments.d)
+            if arguments.d == "blocksworld":
+                from blocksworld import read_file
+            elif arguments.d == "sliding_tiles":
+                from slidingtiles import read_file
+            data, initstate = read_file("C:/Users/melis/"+ arguments.i)
+            search_algorithm(arguments.i, initstate, data, arguments.w, arguments.b)
