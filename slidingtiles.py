@@ -7,8 +7,6 @@ Spyder Editor
 import os.path
 import copy
 
-filename = "10042"
-
 class State:
 
     def __init__(self, dimens, locations):
@@ -106,6 +104,7 @@ def read_file(inputfile):
         
 if __name__=='__main__':        
 #if called from the terminal
+    filename = "10042"
     if os.path.exists("C:/Users/melis/8_puzzles/8_puzzles/"+filename):
         dimens, state = read_file("C:/Users/melis/8_puzzles/8_puzzles/"+filename)
         #dimens, locations = read_file("C:/Users/melis/8_puzzles/8_puzzles/"+filename)
