@@ -25,77 +25,46 @@ import blocksworld
             
 def test_algorithm(algorithm, size, giventype, parameter, domain):
     algor = __import__(algorithm)
+    beamstart = 20
+    beamstop = 61
+    depthstart = 70
+    depthstop = 101
     if size == "large": 
         filestep1 = 20 
         nameset = ("4puzzle1", "9puzzle2", "12puzzle1", "15puzzle2", "18puzzle1")
-        stop3 = 26
+        filestop3 = 26
     elif size == "small":
         filestep1 = 30
         nameset = ("4puzzle1", "9puzzle2", "18puzzle1")
-        stop3 = 21
-    if giventype == "general":
+        filestop3 = 21
+    if giventype == "fixed_beam":
+        beamstart = parameter
+        beamstop = parameter + 1
+    elif giventype == "fixed_depth":
+        depthstart = parameter
+        depthstop = parameter + 1
         if domain == "sliding_tiles" or domain == None:
             print("Hello")
             for i in range(1, 101, filestep1):
                 data, initstate = slidingtiles.read_file("C:/Users/melis/korf100/" + str(i))
                 filename = "korf100/" + str(i)
-                for beam in range(20, 61, 20):
-                    for depth in range(70, 101, 10):
+                for beam in range(beamstart, beamstop, 20):
+                    for depth in range(depthstart, depthstop, 10):
                         algor.search_algorithm(filename, initstate, data, beam, depth)
         if domain == "blocksworld" or domain == None:
             for name in nameset:
                 data, initstate = blocksworld.read_file("C:/Users/melis/blocksworld_puzzles/blocks" + name +".txt")
                 filename = "Blocks_world_puzzles/" + name
-                for beam in range(20, 61, 20):
-                    for depth in range(70, 101, 10):
+                for beam in range(beamstart, beamstop, 20):
+                    for depth in range(depthstart, depthstop, 10):
                         algor.search_algorithm(filename, initstate, data, beam, depth)
         if domain == "sliding_tiles" or domain == None:
-            for i in range(5, stop3, 5):
+            for i in range(5, filestop3, 5):
                 data, initstate = slidingtiles.read_file("C:/Users/melis/8_puzzles/" + str(i) +"42")
                 filename = "8_puzzles/" + str(i) + "42"
-                for beam in range(20, 61, 20):
-                    for depth in range(70, 100, 10):
+                for beam in range(beamstart, beamstop, 20):
+                    for depth in range(depthstart, depthstop, 10):
                         algor.search_algorithm(filename, initstate, data, beam, depth)
-    if giventype == "fixed_beam":
-        beam =  parameter
-        if domain == "sliding_tiles" or domain == None:
-            for i in range(1, 101, filestep1):
-                data, initstate = slidingtiles.read_file("C:/Users/melis/korf100/" + str(i))
-                filename = "korf100/" + str(i)
-                for depth in range(70, 101, 10):
-                    algor.search_algorithm(filename, initstate, data, beam, depth)
-        if domain == "blocksworld" or domain == None:
-            for name in nameset:
-                data, initstate = blocksworld.read_file("C:/Users/melis/blocksworld_puzzles/blocks" + name +".txt")
-                filename = "Blocks_world_puzzles/" + name
-                for depth in range(70, 101, 10):
-                    algor.search_algorithm(filename, initstate, data, beam, depth)
-        if domain == "sliding_tiles" or domain == None:
-            for i in range(5, stop3, 5):
-                data, initstate = slidingtiles.read_file("C:/Users/melis/8_puzzles/" + str(i) +"42")
-                filename = "8_puzzles/" + str(i) + "42"
-                for depth in range(70, 101, 10):
-                    algor.search_algorithm(filename, initstate, data, beam, depth)
-    if giventype == "fixed_depth":
-        depth = parameter
-        if domain == "sliding_tiles" or domain == None:
-            for i in range(1, 101, filestep1):
-                data, initstate = slidingtiles.read_file("C:/Users/melis/korf100/" + str(i))
-                filename = "korf100/" + str(i)
-                for beam in range(20, 61, 20):
-                    algor.search_algorithm(filename, initstate, data, beam, depth)
-        if domain == "blocksworld" or domain == None:
-            for name in nameset:
-                data, initstate = blocksworld.read_file("C:/Users/melis/blocksworld_puzzles/blocks" + name +".txt")
-                filename = "Blocks_world_puzzles/" + name
-                for beam in range(20, 61, 20):
-                    algor.search_algorithm(filename, initstate, data, beam, depth)
-        if domain == "sliding_tiles" or domain == None:
-            for i in range(5, stop3, 5):
-                data, initstate = slidingtiles.read_file("C:/Users/melis/8_puzzles/" + str(i) +"42")
-                filename = "8_puzzles/" + str(i) + "42"
-                for beam in range(20, 61, 20):
-                    algor.search_algorithm(filename, initstate, data, beam, depth)
             
 if __name__=='__main__':
     PARSE = argparse.ArgumentParser()
