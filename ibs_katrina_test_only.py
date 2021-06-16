@@ -25,23 +25,24 @@ class Node:
 
     def __init__(self, state, g, parent, data):
         self.state = state
+        self.h = state.heuristic(data)
         self.g = g
-        self.f = g + state.heuristic(data)
+        self.f = g + self.h
         self.parent = parent
         self.key = str(self.state.key())
         # could store level, but I don't see a point
 
     def __lt__(self, b):
-        return self.f < b.f or (self.f == b.f and self.g > b.g)
+        return self.f < b.f or (self.f == b.f and self.h < b.h)
     
     def __le__(self, b):
-        return self < b or (self.f == b.f and self.g == b.g)
+        return self < b or (self.f == b.f and self.h == b.h)
 
     def __gt__(self, b):
-        return self.f > b.f or (self.f == b.f and self.g < b.g)
+        return self.f > b.f or (self.f == b.f and self.h > b.h)
     
     def __ge___(self, b):
-        return self > b or (self.f == b.f and self.g == b.g)
+        return self > b or (self.f == b.f and self.h == b.h)
 
     def __eq__ (self, b):
         return self.key == b.key
@@ -111,23 +112,24 @@ class RNode:
 
     def __init__(self, state, g, parent, data):
         self.state = state
+        self.h = state.heuristic(data)
         self.g = g
-        self.f = g + state.heuristic(data)
+        self.f = g + self.h
         self.parent = parent
         self.key = str(self.state.key())
         # could store level, but I don't see a point
 
     def __lt__(self, b):
-        return self.f > b.f or (self.f == b.f and self.g < b.g)
+        return self.f > b.f or (self.f == b.f and self.h > b.h)
 
     def __gt__(self, b):
-        return self.f < b.f or (self.f == b.f and self.g > b.g)
+        return self.f < b.f or (self.f == b.f and self.h < b.h)
     
     def __le__(self, b):
-        return self < b or (self.f == b.f and self.g == b.g)
+        return self < b or (self.f == b.f and self.h == b.h)
 
     def __ge__(self, b):
-        return self > b or (self.f == b.f and self.g == b.g)
+        return self > b or (self.f == b.f and self.h == b.h)
 
     def __eq__ (self, b):
         return self.key == b.key
@@ -259,7 +261,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
             while openlist[dep]:
                 current = popfirst (openlist, dep, mdepth)
                 #print(current.h)
-                if (current.f - current.g) == 0:
+                if current.h == 0:
                     if current.f < solution_c:
                         solution_c = current.f
                         goal = current
