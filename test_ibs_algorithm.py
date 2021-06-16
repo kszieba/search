@@ -14,6 +14,9 @@ The optional arguments it can take are as follows:
 -d (domain type in lowercase) default None (sliding_tiles, blocksworld)
 
 """
+import sys
+
+import traceback
 
 import argparse
 
@@ -31,7 +34,7 @@ def test_algorithm(algorithm, size, giventype, parameter, domain):
     depthstop = 101
     if size == "large": 
         filestep1 = 20 
-        nameset = ("4puzzle1", "9puzzle2", "12puzzle1", "15puzzle2", "18puzzle1")
+        nameset = ("4puzzle1", "9puzzle2", "12puzzle1", "15puzzle1", "18puzzle1")
         filestop3 = 26
     elif size == "small":
         filestep1 = 30
@@ -50,21 +53,33 @@ def test_algorithm(algorithm, size, giventype, parameter, domain):
                 filename = "korf100/" + str(i)
                 for beam in range(beamstart, beamstop, 20):
                     for depth in range(depthstart, depthstop, 10):
-                        algor.search_algorithm(filename, initstate, data, beam, depth)
+                        try:
+                            algor.search_algorithm(filename, initstate, data, beam, depth)
+                        except:
+                            print(filename + " " + str(beam) + " " + str(depth), file=sys.stderr)
+                            traceback.print_exception(*sys.exc_info())
         if domain == "blocksworld" or domain == None:
             for name in nameset:
                 data, initstate = blocksworld.read_file("C:/Users/melis/blocksworld_puzzles/blocks" + name +".txt")
-                filename = "Blocks_world_puzzles/blocks" + name + "txt"
+                filename = "Blocks_world_puzzles/blocks" + name + ".txt"
                 for beam in range(beamstart, beamstop, 20):
                     for depth in range(depthstart, depthstop, 10):
-                        algor.search_algorithm(filename, initstate, data, beam, depth)
+                        try:
+                            algor.search_algorithm(filename, initstate, data, beam, depth)
+                        except:
+                            print(filename + " " + str(beam) + " " + str(depth), file=sys.stderr)
+                            traceback.print_exception(*sys.exc_info())
         if domain == "sliding_tiles" or domain == None:
             for i in range(5, filestop3, 5):
                 data, initstate = slidingtiles.read_file("C:/Users/melis/8_puzzles/" + str(i) +"42")
                 filename = "8_puzzles/" + str(i) + "42"
                 for beam in range(beamstart, beamstop, 20):
                     for depth in range(depthstart, depthstop, 10):
-                        algor.search_algorithm(filename, initstate, data, beam, depth)
+                        try:
+                            algor.search_algorithm(filename, initstate, data, beam, depth)
+                        except:
+                            print(filename + " " + str(beam) + " " + str(depth), file=sys.stderr)
+                            traceback.print_exception(*sys.exc_info())
             
 if __name__=='__main__':
     PARSE = argparse.ArgumentParser()
