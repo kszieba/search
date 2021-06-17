@@ -94,8 +94,53 @@ class State:
                             #print(alist[i])
         for i in range(len(keeplist)-1, -1, -1):
             print("|" + "| |".join(keeplist[i]) + "|")
+        print ("\n", end="")
+        print("h: " + str(self.heuristic(volume)))
+        
+    def print_goal(self, volume):
+        b2list = []
+        blist = self._calculate_bottoms(volume)
+        keeplist = [blist, b2list]
+        unfinished = True
+        for i in range(len(blist)):
+            b2list.append(self._upblocks[blist[i]])
+            #print (self._upblocks[blist[i]])
+            #print("Hi?")
+        pastlist = b2list
+        while unfinished:
+            newlist = []
+            unfound = True
+            for i in range(len(pastlist)):
+                if pastlist[i] != None:
+                    newlist.append(self._upblocks[pastlist[i]])
+                    unfound = False
+                else:
+                    newlist.append(None)
+            keeplist.append(newlist)
+            pastlist = newlist
+            if unfound:
+                unfinished = False            
+        for alist in keeplist:
+            if volume < 10:
+                for i in range(len(alist)):
+                    if alist[i] == None:
+                        alist[i] = " "
+                    else:
+                        alist[i] = str(int(alist[i])+1)
+            else:
+                for i in range(len(alist)):
+                    if alist[i] == None:
+                        alist[i] = "  "
+                    else:
+                        if len(str(alist[i]+1)) == 2:
+                            alist[i] = str(int(alist[i])+1)
+                            #print(alist[i])
+                        else:
+                            alist[i] = str(int(alist[i])+1) + " "
+                            #print(alist[i])
+        for i in range(len(keeplist)-1, -1, -1):
+            print("|" + "| |".join(keeplist[i]) + "|")
         print ("\n")
-        #print(self.heuristic())
     
     def heuristic (self, volume):
         #if self._upblocks != transform(self._dblocks):

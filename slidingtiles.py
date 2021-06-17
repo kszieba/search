@@ -36,6 +36,25 @@ class State:
             print("\n", end = "")
         print ("\nh: " + str(self.heuristic(dimens))+ "\n")
         
+    def print_goal(self, dimens):
+        print(str(dimens) + " x " + str(dimens) + "\n")
+        for i in range(1, dimens+1):
+            piece = (self._locationlist[dimens * (i-1):dimens * i])
+            for number in piece:
+                if dimens > 3:
+                    if number > 9:
+                        print(str(number) + " ", end = "")
+                    elif number == 0:
+                        print("__ ", end = "")
+                    else:
+                        print(" " + str(number) + " ", end = "")
+                else:
+                    if number != 0:
+                        print(str(number) + " ", end = "")
+                    else:
+                        print("_ ", end = "")
+            print("\n", end = "")
+        
     def create_children (self, dimens):
         childlist = []
         zeroindex = self._locationlist.index(0)
