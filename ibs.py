@@ -20,6 +20,10 @@ from heap_with_keys import Heap_with_keys
 
 from red_black_tree import RedBlackTree
 
+from guppy import hpy
+h = hpy()
+print(h.heap())
+
 
 class Node:
 
@@ -330,7 +334,10 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                     print("\n")
                     goal.state.print_goal(data)
             else:
-                print("Search was unsuccessful")
+                print("Search was unsuccessful\n\n")
+                print("Total goal count: " + str(goalcount))
+                print ("Costs were: " + str(countlist))
+                print("Beamwidths were:  " + str(beamlist))
             print("Nodes expanded: " + str(expandcount))
             print("Distinct nodes generated: " + str(gencount) + "\n")
             """
