@@ -13,18 +13,18 @@ from heap import Heap
 
 class Node:
     
-    def __init__(self, state, g, parent):
+    def __init__(self, state, g, parent, data):
         self.state = state
-        self.h = state.heuristic()
+        self.h = state.heuristic(data)
         self.g = g
         self.f = g + self.h
         self.parent = parent
         
-    def __le__ (self, b):
-        return self.f < b.f or self.f == b.f and self.h < b.h
+    def __lt__ (self, b):
+        return self.f < b.f or (self.f == b.f and self.h < b.h)
         
     def __gt__ (self, b):
-        return self.f > b.f or self.f == b.f and self.h > b.h
+        return self.f > b.f or (self.f == b.f and self.h > b.h)
         
     def __eq__ (self, b):
         return self.state.key() == b.state.key()
@@ -90,8 +90,8 @@ class Node:
         self.parent.collect_path(thelist)
     """    
     
-def search_algorithm (filename, startstate, data):
-    initial = Node(startstate, 0, None)
+def search_algorithm (filename, startstate, data, call_type="standard"):
+    initial = Node(startstate, 0, None, data)
     heap = Heap([])
     heap.push(initial)
     current = heap.pop()
@@ -101,19 +101,21 @@ def search_algorithm (filename, startstate, data):
         expandcount += 1
         childcollect = current.state.create_children (data)
         for child in childcollect:
-            c = Node (child, current.g + 1, current)
+            c = Node (child, current.g + 1, current, data)
             gencount += 1
-            if c not in heap.alist:
+            if c not in heap:
                 heap.push(c)
         current = heap.pop()
     print("Done!\n" + "g: " + str(current.g) + "\n") 
     print("Nodes expanded: " + str(expandcount))
     print("Nodes generated: " + str(gencount) + "\n")
-    current.state.print_information(data)
+    if call_type == "pictoral":
+        current.state.print_goal(data)
     """
-    pathlist = []
-    current.print_path_a(pathlist)
-    #current.print_backwards_path()
+    elif call_type == "path":
+        pathlist = []
+        current.print_path_a(pathlist)
+        #current.print_backwards_path()
     """
      
         
@@ -123,8 +125,7 @@ if __name__=='__main__':
     #creates parser
     PARSE.add_argument("-i", help='input file path (shortened)', type=str)
     PARSE.add_argument("-d", help='domain name in lowercase', type=str)
-    PARSE.add_argument("-w", help='beam width', type=int)
-    PARSE.add_argument("-b", help='maximum depth', type=int)
+    PARSE.add_argument("-c", help='call type', type=str)
     arguments = PARSE.parse_args()
     #parses arguments
     if not arguments.i:
@@ -135,9 +136,12 @@ if __name__=='__main__':
         if not os.path.exists("C:/Users/melis/" + arguments.i):
             raise ValueError("File could not be found.")      
         domain = arguments.d
-        if domain == "blocksworld":
-            from blocksworld import read_file
-        elif domain == "sliding_tiles":
-            from slidingtiles import read_file
-        data, initstate = read_file("C:/Users/melis/"+ arguments.i)
-        search_algorithm(arguments.i, initstate, data)
+    if domain == "blocksworld":
+        from blocksworld import read_file
+    elif domain == "sliding_tiles":
+        from slidingtiles import read_file
+    data, initstate = read_file("C:/Users/melis/"+ filename)
+    if arguments.c:
+        search_algorithm(filename, initstate, data, arguments.c)
+    else:
+        search_algorithm(filename, initstate, data)
