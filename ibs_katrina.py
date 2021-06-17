@@ -298,22 +298,18 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
             for dep2 in range(solution_c):
                 if waitlist[dep2]:
                     transfer = popfirst(waitlist, dep2, mdepth)
-                    """
-                    if transfer.key == '[3, 0, 4, 16, 6, 17, 12, 9, 5, None, None, 1, 11, None, 15, 7, 13, None]':
-                        print("Hello1")
-                        """
                     inlist = False
                     for i in range(solution_c): #altering this has serious effects
                         if transfer in openlist[i]:
                             if transfer.g < openlist[i][transfer].g:
                                 remove (openlist, i, mdepth, transfer)
-                                push (openlist, dep+1, mdepth, transfer, data)
+                                push (openlist, dep2, mdepth, transfer, data)
                             inlist = True
                             break
                         if transfer.key in closedlist[i]:
                             if transfer.g < closedlist[i][transfer.key].g:
                                 closedlist[i].pop(transfer.key)
-                                push (openlist, dep2+1, mdepth, transfer, data)
+                                push (openlist, dep2, mdepth, transfer, data)
                             inlist = True
                             break
                     if not inlist:

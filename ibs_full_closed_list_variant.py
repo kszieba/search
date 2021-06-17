@@ -284,7 +284,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
                             #print("Hello")
                             if transfer.g < openlist[i][transfer].g:
                                 remove (openlist, i, mdepth, transfer)
-                                push (openlist, dep+1, mdepth, transfer, data)
+                                push (openlist, dep2, mdepth, transfer, data)
                             inlist = True
                             break
                         """
@@ -299,7 +299,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
                             if transfer.g < closedlist[i][transfer.key].g:
                                 closedlist[i].pop(transfer.key)
                                 #print("insert depth is " + str(dep+1))
-                                push (openlist, dep2+1, mdepth, transfer, data)
+                                push (openlist, dep2, mdepth, transfer, data)
                             inlist = True
                             break
                     if not inlist:
