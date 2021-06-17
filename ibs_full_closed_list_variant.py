@@ -226,7 +226,7 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 #end of child generation code
     return genc
 
-def search_algorithm (filename, startstate, data, bwidth, mdepth):
+def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="standard"):
     openlist = [0 for i in range(mdepth * 2)]
     waitlist = [0 for i in range(mdepth)]
     closedlist = [0 for i in range(mdepth)] #creates the initial lists of structures
@@ -310,10 +310,12 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
             print("Max Depth: " + str(mdepth))
             if goal:
                 print("Done!\n" + "g: " + str(goal.g) + "\n")
-                goal.state.print_information(data)
                 print("Total goal count: " + str(goalcount))
                 print ("Costs were: " + str(countlist))
                 print("Beamwidths were:  " + str(beamlist))
+                if call_type == "pictoral":
+                    print("\n")
+                    goal.state.print_goal(data)
             else:
                 print("Search was unsuccessful")
             print("Nodes expanded: " + str(expandcount))
@@ -341,19 +343,27 @@ if __name__=='__main__':
     PARSE.add_argument("-d", help='domain name in lowercase', type=str)
     PARSE.add_argument("-w", help='beam width', type=int)
     PARSE.add_argument("-b", help='maximum depth', type=int)
+    PARSE.add_argument("-c", help='call type', type=str, required=False)
     arguments = PARSE.parse_args()
     #parses arguments
     if not arguments.i:
-        print("No input file was given.")
+        filename = "8_puzzles/1542"
+        domain = "sliding_tiles"
+        width = 60
+        depth = 40
     else:
+        filename = arguments.i
         if not os.path.exists("C:/Users/melis/" + arguments.i):
-        #if file cannot be found
-            raise ValueError("File could not be found.")
-            #raise Value Error (file could not be found)
-        else:
-            if arguments.d == "blocksworld":
-                from blocksworld import read_file
-            elif arguments.d == "sliding_tiles":
-                from slidingtiles import read_file
-            data, initstate = read_file("C:/Users/melis/"+ arguments.i)
-            search_algorithm(arguments.i, initstate, data, arguments.w, arguments.b)
+            raise ValueError("File could not be found.")      
+        domain = arguments.d
+        width = arguments.w
+        depth = arguments.b
+    if domain == "blocksworld":
+        from blocksworld import read_file
+    elif domain == "sliding_tiles":
+        from slidingtiles import read_file
+    data, initstate = read_file("C:/Users/melis/"+ filename)
+    if arguments.c:
+        search_algorithm(filename, initstate, data, width, depth, arguments.c)
+    else:
+        search_algorithm(filename, initstate, data, width, depth)
