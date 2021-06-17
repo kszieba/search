@@ -7,28 +7,9 @@ Created on Wed May 26 19:53:15 2021
 """
 import os.path
 
-domain = "sliding tiles"
-filename = "1542"
+import argparse
 
-if domain == "blocksworld":
-    
-    folder = "Blocks_world_puzzles/"
-
-    from blocksworld6 import read_file
-    
-    from blocksworld6 import State
-    
-    #from blocksworld6 import transform
-
-elif domain == "sliding tiles":
-    
-    folder = "8_puzzles/8_puzzles/"
-    
-    from temp2 import State
-
-    from temp2 import read_file
-
-from ediHeap import Heap
+from heap import Heap
 
 class Node:
     
@@ -109,36 +90,26 @@ class Node:
         self.parent.collect_path(thelist)
     """    
     
-def search_algorithm (startstate):
+def search_algorithm (filename, startstate, data):
     initial = Node(startstate, 0, None)
     heap = Heap([])
     heap.push(initial)
     current = heap.pop()
-    #closedHeap = Heap([])
     expandcount = 0
     gencount = 0
-    #print(initstate._locationlist)
-    while current.state.heuristic() != 0:
+    while current.state.heuristic(data) != 0:
         expandcount += 1
-        childcollect = current.state.create_children ()
+        childcollect = current.state.create_children (data)
         for child in childcollect:
             c = Node (child, current.g + 1, current)
+            gencount += 1
             if c not in heap.alist:
-                gencount += 1
                 heap.push(c)
-        #if expandcount < 10:
-            #print("Hello")
-            #print(current.h, current.f)
-        #current.state.print_information()
-        #else:
-            #break
-            #break
-        #closedHeap.push(current)
         current = heap.pop()
     print("Done!\n" + "g: " + str(current.g) + "\n") 
     print("Nodes expanded: " + str(expandcount))
     print("Nodes generated: " + str(gencount) + "\n")
-    current.state.print_information()
+    current.state.print_information(data)
     """
     pathlist = []
     current.print_path_a(pathlist)
@@ -148,19 +119,25 @@ def search_algorithm (startstate):
         
 if __name__=='__main__':        
 #if called from the terminal
-    if not os.path.exists("C:/Users/melis/" + folder + filename):
-        print("Is your filename correct?")
+    PARSE = argparse.ArgumentParser()
+    #creates parser
+    PARSE.add_argument("-i", help='input file path (shortened)', type=str)
+    PARSE.add_argument("-d", help='domain name in lowercase', type=str)
+    PARSE.add_argument("-w", help='beam width', type=int)
+    PARSE.add_argument("-b", help='maximum depth', type=int)
+    arguments = PARSE.parse_args()
+    #parses arguments
+    if not arguments.i:
+        filename = "8_puzzles/1542"
+        domain = "sliding_tiles"
     else:
-        initstate = State (*read_file("C:/Users/melis/"+ folder + filename))
-        #volume, upblocks, downblocks, goals = read_file("C:/Users/melis/"+ folder + filename)
-        #print (goals)
-        #initstate = State (volume, upblocks, downblocks, goals)
-        #goalstate = State (volume, transform(goals), goals, goals)
-        #initstate._locationlist = [4, 2, 0, 3, 5, 1, 6, 7, 8]
-        #initstate._locationlist = [3, 1, 2, 0, 4, 5, 6, 7, 8]
-        #initstate._0location = 2
-        #initstate._0location = 3
-        #print(goals)
-        #print(goalstate._upblocks, goalstate._dblocks, goalstate._topspoint)
-        #goalstate.print_information()
-        search_algorithm(initstate)
+        filename = arguments.i
+        if not os.path.exists("C:/Users/melis/" + arguments.i):
+            raise ValueError("File could not be found.")      
+        domain = arguments.d
+        if domain == "blocksworld":
+            from blocksworld import read_file
+        elif domain == "sliding_tiles":
+            from slidingtiles import read_file
+        data, initstate = read_file("C:/Users/melis/"+ arguments.i)
+        search_algorithm(arguments.i, initstate, data)
