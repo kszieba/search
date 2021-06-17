@@ -3,6 +3,9 @@
 Incremental Beam Search Algorithm
 This version assumes cost is constant and does not explore deeper levels than
 the one where the current best solution was found.
+
+It is equivalent to a complete goal pruning variant of ibs.
+
 Created on Tue Jun  8 13:47:52 2021
 """
 import os.path
