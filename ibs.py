@@ -126,6 +126,8 @@ class RNode:
 
     def __ge__(self, b):
         return self > b or (self.f == b.f and self.g == b.g)
+    #for the reverse nodes, operators for comparison are the reverse of what 
+    #would normally be considered logical
 
     def __eq__ (self, b):
         return self.key == b.key
@@ -153,10 +155,7 @@ def convertfromRNode(node, data):
 
 def push(listset, depth, mdepth, node, data):
     if type(listset[depth]) != RedBlackTree:
-        #print("Hello, push")
-        #print(node.key)
         listset[depth].push(node)
-        #print(depth + mdepth)
         listset[depth + mdepth].push(convertfromSNode(node, data))
     else:
         listset[depth].insert(node)
@@ -176,6 +175,9 @@ def poplast(listset, depth, mdepth, data):
     else:
         node = listset[depth].pop_max()
     return node
+
+#push, popfirst, and poplast are meant to be used for both heaps and red-black
+#trees
 
 def remove(listset, depth, mdepth, node):
     listset[depth].remove(node)
@@ -205,6 +207,7 @@ def gen_move_children(current, actBW, waitBW, openlist,
                     push (openlist, dep+1, mdepth, c, data)
                 inlist = True
             """
+            #adding the above code would cause non-montonicity
             if c.key in closedlist[i]:
                 if c.g < closedlist[i][c.key].g:
                     closedlist[i].pop(c.key)
