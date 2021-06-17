@@ -183,20 +183,16 @@ def remove(listset, depth, mdepth, node):
 
 def gen_move_children(current, actBW, waitBW, openlist,
     waitlist, closedlist, dep, mdepth, solution_c, data):
-    #print("Depth is " + str(dep))
     genc = 0
     if dep == mdepth-1:
         return genc
     childcollect = current.state.create_children (data)
-    #print("Number of children is " + str(len(childcollect)))
     for i in range(len(childcollect)):
-        #print(i)
         c = Node (childcollect[i], current.g + 1, current, data)
         genc += 1
         inlist = False
-        for i in range(mdepth): #altering this has serious effects
+        for i in range(mdepth):
             if c in openlist[i]:
-                #print("Hello")
                 if c.g < openlist[i][c].g:
                     remove (openlist, i, mdepth, c)
                     push (openlist, dep+1, mdepth, c, data)
@@ -210,33 +206,22 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 inlist = True
             """
             if c.key in closedlist[i]:
-                #print("Hi")
                 if c.g < closedlist[i][c.key].g:
                     closedlist[i].pop(c.key)
                     push (openlist, dep+1, mdepth, c, data)
                 inlist = True
                 break
         if not inlist:
-            #print("Hello?")
             push (openlist, dep+1, mdepth, c, data)
-        #print(inlist)
-        #if len(openlist[dep+1]) + len(closedlist[dep+1])-actBW
-        if len(openlist[dep+1]) + len(closedlist[dep+1]) > actBW: #corresponds to 10  #using while here
-        #reduces active beam width to acceptable range, but doesn't fix the mismatch
-            #print("Hi")
+        if len(openlist[dep+1]) + len(closedlist[dep+1]) > actBW:
             if not closedlist[dep+1]:
                 transfer = poplast(openlist, dep+1, mdepth, data)
                 push (waitlist, dep+1, mdepth, transfer, data)
                 if len(waitlist[dep+1]) > waitBW:
                     poplast(waitlist, dep+1, mdepth, data)
             else:
-                #print("Closed list length is " + str(len(closedlist[dep+1])))
                 closedlist[dep+1].popitem(last=False)
-                #print("Closed list length is now " + str(len(closedlist[dep+1])))
                 #end of child generation code
-    #print("Gencount this time is " + str(genc))
-    #print(len(openlist[dep+1]), actBW)
-    #print(len(openlist[dep+1]) + len(closedlist[dep+1]) + len(waitlist[dep+1]))
     return genc
 
 def search_algorithm (filename, startstate, data, bwidth, mdepth):
@@ -261,7 +246,6 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
     gencount = 0
     while True:
         for dep in range(mdepth):
-            #print(dep)
             while openlist[dep]:
                 current = popfirst (openlist, dep, mdepth)
                 if (current.f - current.g) == 0:
@@ -272,29 +256,20 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
                         countlist.append(current.f)
                         beamlist.append(actBW)
                     closedlist[dep][current.key] = current
-                    #print(closedlist[dep])
                     continue
                 closedlist[dep][current.key] = current
                 gencount += gen_move_children(current, actBW, waitBW, openlist,
     waitlist, closedlist, dep, mdepth, solution_c, data)
                 expandcount += 1
-                #print(closedlist[dep])
-                #print("Closed list length is " + str(len(closedlist[dep])))
-                #print("Active beamwidth is " + str(actBW))
         if waitBW > 0:
             actBW += 1
             waitBW -= 1
-            #print(waitBW)
             for dep2 in range(mdepth):
-                #print("Hello")
-                #waitlist[dep2].pretty_print()
-                #print(waitlist[dep2].length)
                 if waitlist[dep2]:
                     transfer = popfirst(waitlist, dep2, mdepth)
                     inlist = False
-                    for i in range(mdepth): #altering this has serious effects
+                    for i in range(mdepth):
                         if transfer in openlist[i]:
-                            #print("Hello")
                             if transfer.g < openlist[i][transfer].g:
                                 remove (openlist, i, mdepth, transfer)
                                 push (openlist, dep+1, mdepth, transfer, data)
@@ -308,10 +283,8 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
                             inlist = True
                         """
                         if transfer.key in closedlist[i]:
-                            #print("Hi")
                             if transfer.g < closedlist[i][transfer.key].g:
                                 closedlist[i].pop(transfer.key)
-                                #print("insert depth is " + str(dep+1))
                                 push (openlist, dep2+1, mdepth, transfer, data)
                             inlist = True
                             break
@@ -331,12 +304,6 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth):
                 print("Search was unsuccessful")
             print("Nodes expanded: " + str(expandcount))
             print("Distinct nodes generated: " + str(gencount) + "\n")
-            """
-            for i in range(len(openlist)):
-                print("For " + str(i))
-                for key in openlist[i].dct.keys():
-                    print(type(key))
-            """
             
             return
     """
@@ -360,9 +327,7 @@ if __name__=='__main__':
         print("No input file was given.")
     else:
         if not os.path.exists("C:/Users/melis/" + arguments.i):
-        #if file cannot be found
             raise ValueError("File could not be found.")
-            #raise Value Error (file could not be found)
         else:
             if arguments.d == "blocksworld":
                 from blocksworld import read_file
