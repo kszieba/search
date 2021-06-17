@@ -19,6 +19,7 @@ class Node:
         self.g = g
         self.f = g + self.h
         self.parent = parent
+        self.key = self.state.key()
         
     def __lt__ (self, b):
         return self.f < b.f or (self.f == b.f and self.h < b.h)
@@ -27,13 +28,13 @@ class Node:
         return self.f > b.f or (self.f == b.f and self.h > b.h)
         
     def __eq__ (self, b):
-        return self.state.key() == b.state.key()
+        return self.key == b.key
         
     def __hash__ (self):
-        return hash(str(self.state.key()))  
+        return hash(str(self.key))  
     
     def return_key (self):
-        return str(self.state.key())
+        return str(self.key)
     
     def print_backwards_path (self):
         self.state.print_information()
