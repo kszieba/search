@@ -26,7 +26,7 @@ def create_4_rows(inputpath, domain, beam, depth):
     for algorithm in algorithms:
         wname = "_".join([algorithm, folder, file, str(beam), str(depth) + ".txt"])
         wnames.append(wname)
-        wfile = open(wname, "w")
+        wfile = open("Testing_Results/" + wname, "w")
         sys.stdout = wfile
         if algorithm == "ibs":
             cProfile.runctx("ibs.search_algorithm(file, initstate, data, beam, depth)", 
@@ -51,7 +51,7 @@ def create_4_rows(inputpath, domain, beam, depth):
     for i in range(len(algorithms)):
         algorithm = algorithms[i]
         rname = wnames[i]
-        rfile = open(rname, "r")
+        rfile = open("Testing_Results/" + rname, "r")
         count = -1
         time = ""
         g = ""
