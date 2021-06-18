@@ -21,6 +21,7 @@ def create_4_rows(inputpath, domain, beam, depth):
     stdout = sys.stdout
     data, initstate = read_file("C:/Users/melis/" + folder + "/" + file)
     wnames = []
+    #algorithms = ("ibs", "ibs_fcl")
     algorithms = ("ibs", "ibs_fcl", "ibs_k", "ibs_kfcl")
     for algorithm in algorithms:
         wname = "_".join([algorithm, folder, file, str(beam), str(depth) + ".txt"])
@@ -47,28 +48,58 @@ def create_4_rows(inputpath, domain, beam, depth):
     finalname = "_".join([folder, file, str(beam), str(depth) + ".csv"])
     finalfile = open(finalname, "w")
     sys.stdout = finalfile
-    for i in range(4):
+    for i in range(len(algorithms)):
         algorithm = algorithms[i]
-        rname = "_".join([algorithm, folder, file, str(beam), str(depth) + ".txt"])
+        rname = wnames[i]
         rfile = open(rname, "r")
-        count = 0
+        count = -1
         time = ""
+        g = ""
+        gcount = ""
         correct = False
         for line in rfile:
-            if count == 12:
+            count += 1
+            if count == 4:
+                #print(line, file=sys.stderr, end="")
                 for j in range(len(line)):
-                    if line[j-1:j+1] == "in":
+                    if line[j-1] == ":":
                         correct = True
                         continue
                     if correct:
-                        if line[j] != " " and line[j] != "s":
-                            time += line[j]
-                        elif line[j] == "s":
-            
+                        if line[j].isnumeric():
+                            g += line[j]
+                        elif line[j] == "\n":
+                            #print(g, file=sys.stderr)
+                            correct = False
+                            break
+            elif count == 6:
+                #print(line, file=sys.stderr, end="")
+                for k in range(len(line)):
+                    if line[k-1] == ":":
+                        correct = True
+                        continue
+                    if correct:
+                        if line[k].isnumeric():
+                            gcount += line[k]
+                        elif line[k] == "\n":
+                            #print(gcount, file=sys.stderr)
+                            correct = False
+                            break
+            elif count == 12:
+                #print(line, file=sys.stderr, end="")
+                for l in range(len(line)):
+                    if line[l-2:l] == "in":
+                        correct = True
+                        continue
+                    if correct:
+                        if line[l].isnumeric() or line[l] == ".":
+                            time += line[l]
+                        elif line[l] == "\n":
+                            #print(time, file=sys.stderr)
+                            correct = False
                             break
             elif count == -1:
                 break
-            count += 1
         if algorithm == "ibs":
             aname = "ibs"
         elif algorithm == "ibs_fcl":
@@ -77,7 +108,7 @@ def create_4_rows(inputpath, domain, beam, depth):
             aname = "ibs_katrina" 
         else:
             aname = "ibs_katrina_full_closed_list"  
-        print(",".join([wnames[i], aname, domain, folder, file, str(data), str(beam), str(depth), time]))
+        print(",".join([wnames[i], aname, domain, folder, file, str(data), str(beam), str(depth), g, gcount, time]))
         rfile.close()
     finalfile.close()
     sys.stdout = stdout
