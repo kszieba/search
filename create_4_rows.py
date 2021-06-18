@@ -53,9 +53,11 @@ def create_4_rows(inputpath, domain, beam, depth):
         rname = wnames[i]
         rfile = open("Testing_Results/" + rname, "r")
         count = -1
-        time = ""
         g = ""
         gcount = ""
+        excount = ""
+        gencount = ""
+        time = ""
         correct = False
         for line in rfile:
             count += 1
@@ -74,27 +76,57 @@ def create_4_rows(inputpath, domain, beam, depth):
                             break
             elif count == 6:
                 #print(line, file=sys.stderr, end="")
-                for k in range(len(line)):
-                    if line[k-1] == ":":
+                j = 0
+                for j in range(len(line)):
+                    if line[j-1] == ":":
                         correct = True
                         continue
                     if correct:
-                        if line[k].isnumeric():
-                            gcount += line[k]
-                        elif line[k] == "\n":
+                        if line[j].isnumeric():
+                            gcount += line[j]
+                        elif line[j] == "\n":
+                            #print(gcount, file=sys.stderr)
+                            correct = False
+                            break
+            elif count == 9:
+                #print(line, file=sys.stderr, end="")
+                j = 0
+                for j in range(len(line)):
+                    if line[j-1] == ":":
+                        correct = True
+                        continue
+                    if correct:
+                        if line[j].isnumeric():
+                            excount += line[j]
+                        elif line[j] == "\n":
+                            #print(gcount, file=sys.stderr)
+                            correct = False
+                            break
+            elif count == 10:
+                #print(line, file=sys.stderr, end="")
+                j = 0
+                for j in range(len(line)):
+                    if line[j-1] == ":":
+                        correct = True
+                        continue
+                    if correct:
+                        if line[j].isnumeric():
+                            gencount += line[j]
+                        elif line[j] == "\n":
                             #print(gcount, file=sys.stderr)
                             correct = False
                             break
             elif count == 12:
                 #print(line, file=sys.stderr, end="")
-                for l in range(len(line)):
-                    if line[l-2:l] == "in":
+                j = 0
+                for j in range(len(line)):
+                    if line[j-2:j] == "in":
                         correct = True
                         continue
                     if correct:
-                        if line[l].isnumeric() or line[l] == ".":
-                            time += line[l]
-                        elif line[l] == "\n":
+                        if line[j].isnumeric() or line[j] == ".":
+                            time += line[j]
+                        elif line[j] == "\n":
                             #print(time, file=sys.stderr)
                             correct = False
                             break
@@ -108,7 +140,118 @@ def create_4_rows(inputpath, domain, beam, depth):
             aname = "ibs_katrina" 
         else:
             aname = "ibs_katrina_full_closed_list"  
-        print(",".join([wnames[i], aname, domain, folder, file, str(data), str(beam), str(depth), g, gcount, time]))
+        print(",".join([rname, aname, domain, folder, file, str(data), 
+                        str(beam), str(depth), g, gcount, excount, gencount,
+                        time]))
+        rfile.close()
+    finalfile.close()
+    sys.stdout = stdout
+    
+def read_files_for_csv(inputpath, domain, beam, depth):
+    path = inputpath.split("/")
+    folder = path[0]
+    file = path[1]
+    stdout = sys.stdout
+    data, initstate = read_file("C:/Users/melis/" + folder + "/" + file)
+    finalname = "_".join([folder, file, str(beam), str(depth) + "_2.csv"])
+    finalfile = open(finalname, "w")
+    sys.stdout = finalfile
+    algorithms = ("ibs", "ibs_fcl", "ibs_k", "ibs_kfcl")
+    for i in range(len(algorithms)):
+        algorithm = algorithms[i]
+        rname = "_".join([algorithm, folder, file, str(beam), str(depth) + ".txt"])
+        rfile = open("Testing_Results/" + rname, "r")
+        count = -1
+        g = ""
+        gcount = ""
+        excount = ""
+        gencount = ""
+        time = ""
+        correct = False
+        for line in rfile:
+            count += 1
+            if count == 4:
+                #print(line, file=sys.stderr, end="")
+                for j in range(len(line)):
+                    if line[j-1] == ":":
+                        correct = True
+                        continue
+                    if correct:
+                        if line[j].isnumeric():
+                            g += line[j]
+                        elif line[j] == "\n":
+                            #print(g, file=sys.stderr)
+                            correct = False
+                            break
+            elif count == 6:
+                #print(line, file=sys.stderr, end="")
+                j = 0
+                for j in range(len(line)):
+                    if line[j-1] == ":":
+                        correct = True
+                        continue
+                    if correct:
+                        if line[j].isnumeric():
+                            gcount += line[j]
+                        elif line[j] == "\n":
+                            #print(gcount, file=sys.stderr)
+                            correct = False
+                            break
+            elif count == 9:
+                #print(line, file=sys.stderr, end="")
+                j = 0
+                for j in range(len(line)):
+                    if line[j-1] == ":":
+                        correct = True
+                        continue
+                    if correct:
+                        if line[j].isnumeric():
+                            excount += line[j]
+                        elif line[j] == "\n":
+                            #print(gcount, file=sys.stderr)
+                            correct = False
+                            break
+            elif count == 10:
+                #print(line, file=sys.stderr, end="")
+                j = 0
+                for j in range(len(line)):
+                    if line[j-1] == ":":
+                        correct = True
+                        continue
+                    if correct:
+                        if line[j].isnumeric():
+                            gencount += line[j]
+                        elif line[j] == "\n":
+                            #print(gcount, file=sys.stderr)
+                            correct = False
+                            break
+            elif count == 12:
+                #print(line, file=sys.stderr, end="")
+                j = 0
+                for j in range(len(line)):
+                    if line[j-2:j] == "in":
+                        correct = True
+                        continue
+                    if correct:
+                        if line[j].isnumeric() or line[j] == ".":
+                            time += line[j]
+                        elif line[j] == "\n":
+                            #print(time, file=sys.stderr)
+                            correct = False
+                            break
+            elif count == -1:
+                break
+        if algorithm == "ibs":
+            aname = "ibs"
+        elif algorithm == "ibs_fcl":
+            aname = "ibs_full_closed_list_variant"   
+        elif algorithm == "ibs_k":
+            aname = "ibs_katrina" 
+        else:
+            aname = "ibs_katrina_full_closed_list"  
+        print(",".join([rname, aname, domain, folder, file, str(data), 
+                        str(beam), str(depth), g, gcount, excount, gencount,
+                        time]))
         rfile.close()
     finalfile.close()
     sys.stdout = stdout
