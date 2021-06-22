@@ -7,15 +7,12 @@ from red_black_tree import RedBlackTree
 
 class Node:
 
-    def __init__(self, state, g, parent, data, f=None):
+    def __init__(self, state, g, parent, data):
         self.state = state
         self.g = g
-        if f:
-            self.f = f
-        else:
-            self.f = g + state.heuristic(data)
+        self.f = g + state.heuristic(data)
         self.parent = parent
-        self.key = str(self.state.key())
+        self.key = self.state.key()
         # could store level, but I don't see a point
 
     def __lt__(self, b):

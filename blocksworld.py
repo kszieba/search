@@ -228,7 +228,7 @@ class State:
         return childlist[:childnumber]
     
     def key(self):
-        return self._upblocks
+        return str(self._upblocks)
 
 def read_file(inputfile):
     readingfile = open (inputfile, "r")

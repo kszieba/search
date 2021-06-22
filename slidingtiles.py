@@ -53,52 +53,46 @@ class State:
                         print("_ ", end = "")
             print("\n", end = "")
     
-    """
-    def get_location_slices (orig, break1, break2):
+
+    def get_simple_new_tuple (self, orig, break1, break2):
+        return orig[:break1] + (orig[break2],) \
+            + (orig[break1],) + orig[break2 + 1:]
+            
+    def get_complex_new_tuple (self, orig, break1, break2):
         return orig[:break1] + (orig[break2],) + orig[break1+1:break2] \
-            + (orig[break1],) + orig[break2:]
-    """
+            + (orig[break1],) + orig[break2 + 1:]
+
         
     def create_children (self, dimens):
         childlist = []
         zeroindex = self._zeroindex
         #print(zeroindex)
         if zeroindex > dimens-1 and self._ntype != "d":
-            uc_locationlist = self._locationlist[:zeroindex - dimens] + (0,) + \
-                self._locationlist[zeroindex - dimens + 1: zeroindex] + \
-                (self._locationlist[zeroindex - dimens],) + \
-                self._locationlist[zeroindex + 1:]
+            uc_locationlist = self.get_complex_new_tuple(self._locationlist, zeroindex - dimens, zeroindex)
+            #print(uc_locationlist)
             uc_zeroindex = zeroindex - dimens
-            uc_ntype = "u"
-            uc = State(uc_locationlist, uc_zeroindex, uc_ntype)
+            uc = State(uc_locationlist, uc_zeroindex, "u")
             childlist.append(uc)
             #print("Hello???")
         if (zeroindex + 1) % dimens and self._ntype != "l":
-            rc_locationlist = self._locationlist[:zeroindex] + \
-                (self._locationlist[zeroindex + 1],) + \
-                (0,) + \
-                self._locationlist[zeroindex + 2:]
+            rc_locationlist = self.get_simple_new_tuple(self._locationlist, zeroindex, zeroindex + 1)
+            #print(rc_locationlist)
             rc_zeroindex = zeroindex + 1
-            rc_ntype = "r"
-            rc = State(rc_locationlist, rc_zeroindex, rc_ntype)
+            rc = State(rc_locationlist, rc_zeroindex, "r")
             childlist.append(rc)
             #print("Hello?")
         if zeroindex % dimens and self._ntype != "r":
-            lc_locationlist = self._locationlist[:zeroindex - 1] + (0,) +\
-                (self._locationlist[zeroindex - 1],) + \
-                self._locationlist[zeroindex + 1:]
+            lc_locationlist = self.get_simple_new_tuple(self._locationlist, zeroindex - 1, zeroindex)
+            #print(lc_locationlist)
             lc_zeroindex = zeroindex - 1
-            lc_ntype = "l"
-            lc = State(lc_locationlist, lc_zeroindex, lc_ntype)
+            lc = State(lc_locationlist, lc_zeroindex, "l")
             childlist.append(lc)
             #print("Hello??")
         if zeroindex < (dimens-1) * dimens and self._ntype != "u":
-            dc_locationlist = self._locationlist[:zeroindex] + (self._locationlist[zeroindex + dimens],) +\
-                self._locationlist[zeroindex + 1 : zeroindex + dimens] + \
-                (0,) + self._locationlist[zeroindex + dimens + 1 :]
+            dc_locationlist = self.get_complex_new_tuple(self._locationlist, zeroindex, zeroindex + dimens)
+            #print(dc_locationlist)
             dc_zeroindex = zeroindex + dimens
-            dc_ntype = "d"
-            dc = State(dc_locationlist, dc_zeroindex, dc_ntype)
+            dc = State(dc_locationlist, dc_zeroindex, "d")
             childlist.append(dc)
             #print("Hello????")
         return childlist
@@ -119,7 +113,7 @@ class State:
         return total
     
     def key(self):
-        return self._locationlist
+        return str(self._locationlist)
 
 def read_file(inputfile):
     readingfile = open (inputfile, "r")
