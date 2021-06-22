@@ -56,45 +56,65 @@ def makeSequence(length):
     return sequence 
 
 
-def plot_expandcount(inputfile, domain):
+def plot_variable(inputfile, domain, plot_type):
     ibs_list = []
     ibs_fcl_list = []
     ibs_k_list = []
     ibs_k_fcl_list = []
     linecount = 0
+    if domain == "sliding_tiles":
+        domainname = "Sliding Tiles"
+    else:
+        domainname = "Blocksworld"
+    plot_types = ["" for j in range(18)]
+    plot_types[12] = "expandcount"
+    plot_types[13] = "gencount"
+    plot_types[14] = "time"
+    plot_types[15] = "memory"
+    for i in range(len(plot_types)):
+        if plot_types[i] == plot_type:
+            break
     rfile = open(inputfile, "r")
     for line in rfile:
-        linecount += 1
         pieces = line.split(",")
-        if pieces[4] == domain:
-            if pieces[3] == "ibs":
-                ibs_list.append(pieces[12])
-            elif pieces[3] == "ibs_full_closed_list_variant":
-                ibs_fcl_list.append(pieces[12])
-            elif pieces[3] == "ibs_katrina":
-                ibs_k_list.append(pieces[12])
-            elif pieces[3] == "ibs_katrina_full_closed_list":
-                ibs_k_fcl_list.append(pieces[12])
-    count = [0 for i in range(linecount//4)]
-    for i in range(linecount//4):
-        count[i] = i
-    count_array = np.array(count)
-    ibs_array = np.array(ibs_list)
-    ibs_fcl_array = np.array(ibs_fcl_list)
-    ibs_k_array = np.array(ibs_k_list)
-    ibs_k_fcl_array = np.array(ibs_k_fcl_list)
-    plt.plot(count_array, ibs_array)
-    print(ibs_list)
-    plt.plot(count_array, ibs_fcl_array)
-    plt.plot(count_array, ibs_k_array)
-    plt.plot(count_array, ibs_k_fcl_array)
-    plt.ylim(0, 70000)
-    plt.title("Plot of Nodes Expanded")
+        if pieces[16] != "Yes":
+            if pieces[4] == domain:
+                if i in (12, 13, 15):
+                    if pieces[3] == "ibs":
+                        ibs_list.append(int(pieces[i]))
+                    elif pieces[3] == "ibs_full_closed_list_variant":
+                        ibs_fcl_list.append(int(pieces[i]))
+                    elif pieces[3] == "ibs_katrina":
+                        ibs_k_list.append(int(pieces[i]))
+                    elif pieces[3] == "ibs_katrina_full_closed_list":
+                        ibs_k_fcl_list.append(int(pieces[i]))
+                elif i in (14,):
+                    if pieces[3] == "ibs":
+                        ibs_list.append(float(pieces[i]))
+                    elif pieces[3] == "ibs_full_closed_list_variant":
+                        ibs_fcl_list.append(float(pieces[i]))
+                    elif pieces[3] == "ibs_katrina":
+                        ibs_k_list.append(float(pieces[i]))
+                    elif pieces[3] == "ibs_katrina_full_closed_list":
+                        ibs_k_fcl_list.append(float(pieces[i]))
+                linecount += 1
+    count = [0 for j in range(linecount//4)]
+    for j in range(linecount//4):
+        count[j] = j
+    plt.plot(count, ibs_list)
+    plt.plot(count, ibs_fcl_list)
+    plt.plot(count, ibs_k_list)
+    plt.plot(count, ibs_k_fcl_list)
+    titlelist = plot_types = ["" for j in range(18)]
+    titlelist[12] = "Nodes Expanded"
+    titlelist[13] = "Nodes Generated"
+    titlelist[14] = "Cumulative Time (sec)"
+    titlelist[15] = "Cumulative Memory (bytes)"
+    plt.title("Plot of "+ titlelist[i] + " for " + domainname)
     plt.show()
 
 def plot_data(inputfile, plot_type, domain):
-    if plot_type == "expandcount":
-        plot_expandcount (inputfile, domain)
+    plot_variable (inputfile, domain, plot_type)
 
 
 if __name__=='__main__':
@@ -105,7 +125,7 @@ if __name__=='__main__':
     PARSE.add_argument("-d", help='domain', type=str)
     arguments = PARSE.parse_args()
     if not arguments.i:
-        inputfile = "ibs_results1.csv"
-        plot_type = "expandcount"
-        domain = "sliding_tiles"
+        inputfile = "ibs_results2.csv"
+        plot_type = "time"
+        domain = "blocksworld"
     plot_data (inputfile, plot_type, domain)
