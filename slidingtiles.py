@@ -9,12 +9,10 @@ import copy
 
 class State:
 
-    def __init__(self, dimens, locations):
-    #initializes class, taking two parameters including self
-        self._locationlist = [0 for i in range(dimens * dimens)]
-        for i in range(dimens * dimens):
-            self._locationlist[int(locations[i])] = i
-        self._ntype = None
+    def __init__(self, locationlist, zeroindex, ntype=None):
+        self._locationlist = locationlist
+        self._ntype = ntype
+        self._zeroindex = zeroindex
         
     def print_information(self, dimens):
         print(str(dimens) + " x " + str(dimens) + "\n")
@@ -54,36 +52,53 @@ class State:
                     else:
                         print("_ ", end = "")
             print("\n", end = "")
+    
+    """
+    def get_location_slices (orig, break1, break2):
+        return orig[:break1] + (orig[break2],) + orig[break1+1:break2] \
+            + (orig[break1],) + orig[break2:]
+    """
         
     def create_children (self, dimens):
         childlist = []
-        zeroindex = self._locationlist.index(0)
+        zeroindex = self._zeroindex
+        #print(zeroindex)
         if zeroindex > dimens-1 and self._ntype != "d":
-            uc = copy.deepcopy(self)
-            uc._locationlist[zeroindex] = uc._locationlist[zeroindex - dimens]
-            uc._locationlist[zeroindex - dimens] = 0
-            uc._ntype = "u"
+            uc_locationlist = self._locationlist[:zeroindex - dimens] + (0,) + \
+                self._locationlist[zeroindex - dimens + 1: zeroindex] + \
+                (self._locationlist[zeroindex - dimens],) + \
+                self._locationlist[zeroindex + 1:]
+            uc_zeroindex = zeroindex - dimens
+            uc_ntype = "u"
+            uc = State(uc_locationlist, uc_zeroindex, uc_ntype)
             childlist.append(uc)
             #print("Hello???")
         if (zeroindex + 1) % dimens and self._ntype != "l":
-            rc = copy.deepcopy(self)
-            rc._locationlist[zeroindex] = rc._locationlist[zeroindex+1]
-            rc._locationlist[zeroindex+1] = 0
-            rc._ntype = "r"
+            rc_locationlist = self._locationlist[:zeroindex] + \
+                (self._locationlist[zeroindex + 1],) + \
+                (0,) + \
+                self._locationlist[zeroindex + 2:]
+            rc_zeroindex = zeroindex + 1
+            rc_ntype = "r"
+            rc = State(rc_locationlist, rc_zeroindex, rc_ntype)
             childlist.append(rc)
             #print("Hello?")
         if zeroindex % dimens and self._ntype != "r":
-            lc = copy.deepcopy(self)
-            lc._locationlist[zeroindex] = lc._locationlist[zeroindex-1]
-            lc._locationlist[zeroindex-1] = 0
-            lc._ntype = "l"
+            lc_locationlist = self._locationlist[:zeroindex - 1] + (0,) +\
+                (self._locationlist[zeroindex - 1],) + \
+                self._locationlist[zeroindex + 1:]
+            lc_zeroindex = zeroindex - 1
+            lc_ntype = "l"
+            lc = State(lc_locationlist, lc_zeroindex, lc_ntype)
             childlist.append(lc)
             #print("Hello??")
         if zeroindex < (dimens-1) * dimens and self._ntype != "u":
-            dc = copy.deepcopy(self)
-            dc._locationlist[zeroindex] = dc._locationlist[zeroindex + dimens]
-            dc._locationlist[zeroindex + dimens] = 0
-            dc._ntype = "d"
+            dc_locationlist = self._locationlist[:zeroindex] + (self._locationlist[zeroindex + dimens],) +\
+                self._locationlist[zeroindex + 1 : zeroindex + dimens] + \
+                (0,) + self._locationlist[zeroindex + dimens + 1 :]
+            dc_zeroindex = zeroindex + dimens
+            dc_ntype = "d"
+            dc = State(dc_locationlist, dc_zeroindex, dc_ntype)
             childlist.append(dc)
             #print("Hello????")
         return childlist
@@ -118,7 +133,13 @@ def read_file(inputfile):
         elif count > (dimens * dimens + 3):
             break
         count = count + 1
-    state = State(dimens, locations)
+    locationslist = [0 for i in range(dimens * dimens)]
+    for i in range(dimens * dimens):
+        locationslist[int(locations[i])] = i
+        if i == 0:
+            zeroindex = int(locations[i])
+    locationlist = tuple(locationslist)
+    state = State(locationlist, zeroindex)
     return dimens, state
         
 if __name__=='__main__':        
