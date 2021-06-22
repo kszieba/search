@@ -37,6 +37,7 @@ def gen_move_children(current, actBW, waitBW, openlist,
         return genc
     childcollect = current.state.create_children (data)
     #print("Number of children is " + str(len(childcollect)))
+    ndep = dep + 1
     for i in range(len(childcollect)):
         #print(i)
         c = Node (childcollect[i], current.g + 1, current, data)
@@ -47,7 +48,7 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 #print("Hello")
                 if c.g < openlist[i][c].g:
                     remove (openlist, i, mdepth, c)
-                    push (openlist, dep+1, mdepth, c, data)
+                    push (openlist, ndep, mdepth, c, data)
                 inlist = True
                 break
             """
@@ -61,25 +62,25 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 #print("Hi")
                 if c.g < closedlist[i][c.key].g:
                     closedlist[i].pop(c.key)
-                    push (openlist, dep+1, mdepth, c, data)
+                    push (openlist, ndep, mdepth, c, data)
                 inlist = True
                 break
         if not inlist:
             #print("Hello?")
-            push (openlist, dep+1, mdepth, c, data)
+            push (openlist, ndep, mdepth, c, data)
         #print(inlist)
         #if len(openlist[dep+1]) + len(closedlist[dep+1])-actBW
-        if len(openlist[dep+1]) + len(closedlist[dep+1]) > actBW: #corresponds to 10  #using while here
+        if len(openlist[ndep]) + len(closedlist[ndep]) > actBW: #corresponds to 10  #using while here
         #reduces active beam width to acceptable range, but doesn't fix the mismatch
             #print("Hi")
-            if not closedlist[dep+1]:
-                transfer = poplast(openlist, dep+1, mdepth, data)
-                push (waitlist, dep+1, mdepth, transfer, data)
-                if len(waitlist[dep+1]) > waitBW:
-                    poplast(waitlist, dep+1, mdepth, data)
+            if not closedlist[ndep]:
+                transfer = poplast(openlist, ndep, mdepth, data)
+                push (waitlist, ndep, mdepth, transfer, data)
+                if len(waitlist[ndep]) > waitBW:
+                    poplast(waitlist, ndep, mdepth, data)
             else:
                 #print("Closed list length is " + str(len(closedlist[dep+1])))
-                closedlist[dep+1].popitem(last=False)
+                closedlist[ndep].popitem(last=False)
                 #print("Closed list length is now " + str(len(closedlist[dep+1])))
                 #end of child generation code
     #print("Gencount this time is " + str(genc))
