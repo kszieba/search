@@ -98,11 +98,10 @@ class State:
         return childlist
     
     def find_value (self, index, goalnumber, dimens):
-        
-        dcount = abs(goalnumber // dimens - index // dimens)
-        ncount = abs(goalnumber % dimens - index % dimens)
         if goalnumber == 0:
             return 0
+        dcount = abs(goalnumber // dimens - index // dimens)
+        ncount = abs(goalnumber % dimens - index % dimens)
         return dcount + ncount
 
     def heuristic (self, dimens):
