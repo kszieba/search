@@ -39,33 +39,33 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 #print("Hello")
                 if c.g < openlist[i][c].g:
                     remove (openlist, i, mdepth, c)
-                    push (openlist, ndep, mdepth, c, data)
+                    push (openlist, ndep, mdepth, c)
                 inlist = True
                 break
             """
             if c in waitlist[i]:
                 if c.g < waitlist[i][c].g:
                     remove (waitlist, i, mdepth, c)
-                    push (openlist, ndep, mdepth, c, data)
+                    push (openlist, ndep, mdepth, c)
                 inlist = True
             """
             if c.key in closedlist[i]:
                 #print("Hi")
                 if c.g < closedlist[i][c.key].g:
                     closedlist[i].pop(c.key)
-                    push (openlist, ndep, mdepth, c, data)
+                    push (openlist, ndep, mdepth, c)
                 inlist = True
                 break
         if not inlist:
             #print("Hello?")
-            push (openlist, ndep, mdepth, c, data)
+            push (openlist, ndep, mdepth, c)
         #print(inlist)
         #if len(openlist[ndep]) + len(closedlist[ndep])-actBW
         if len(openlist[ndep]) > actBW:
-            transfer = poplast(openlist, ndep, mdepth, data)
-            push (waitlist, ndep, mdepth, transfer, data)
+            transfer = poplast(openlist, ndep, mdepth)
+            push (waitlist, ndep, mdepth, transfer)
             if len(waitlist[ndep]) > waitBW:
-                poplast(waitlist, ndep, mdepth, data)
+                poplast(waitlist, ndep, mdepth)
                 #end of child generation code
     return genc
 
@@ -84,7 +84,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
     countlist = []
     beamlist = []
     initial = Node(startstate, 0, None, data)
-    push (openlist, 0, mdepth, initial, data)
+    push (openlist, 0, mdepth, initial)
     actBW = 1
     waitBW = bwidth - actBW
     expandcount = 0
@@ -127,14 +127,14 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                             #print("Hello")
                             if transfer.g < openlist[i][transfer].g:
                                 remove (openlist, i, mdepth, transfer)
-                                push (openlist, dep2, mdepth, transfer, data)
+                                push (openlist, dep2, mdepth, transfer)
                             inlist = True
                             break
                         """
                         if c in waitlist[i]:
                             if c.g < waitlist[i][c].g:
                                 remove (waitlist, i, mdepth, c)
-                                push (openlist, ndep, mdepth, c, data)
+                                push (openlist, ndep, mdepth, c)
                             inlist = True
                         """
                         if transfer.key in closedlist[i]:
@@ -142,11 +142,11 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                             if transfer.g < closedlist[i][transfer.key].g:
                                 closedlist[i].pop(transfer.key)
                                 #print("insert depth is " + str(ndep))
-                                push (openlist, dep2, mdepth, transfer, data)
+                                push (openlist, dep2, mdepth, transfer)
                             inlist = True
                             break
                     if not inlist:
-                        push(openlist, dep2, mdepth, transfer, data)
+                        push(openlist, dep2, mdepth, transfer)
         else:
             print("File: " + filename)
             print("Beamwidth: " + str(bwidth))
