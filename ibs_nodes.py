@@ -131,7 +131,7 @@ def convertfromSNode(key, g, f):
     rNode = RNode(key, g, f)
     return rNode
 
-def push(listset, depth, mdepth, node, data):
+def push(listset, depth, mdepth, node):
     if type(listset[depth]) != RedBlackTree:
         listset[depth].push(node)
         listset[depth + mdepth].push(convertfromSNode(node.key, node.g, node.f))
@@ -147,7 +147,7 @@ def popfirst(listset, depth, mdepth):
         node = listset[depth].pop_min()
     return node
         
-def poplast(listset, depth, mdepth, data):
+def poplast(listset, depth, mdepth):
     if type(listset[depth]) != RedBlackTree:
         node = listset[depth].remove(listset[depth + mdepth].pop())
     else:
@@ -157,3 +157,12 @@ def poplast(listset, depth, mdepth, data):
 def remove(listset, depth, mdepth, node):
     listset[depth].remove(node)
     listset[depth + mdepth].remove(node)
+
+"""
+def check_node(listset, depth, mdepth):
+    if type(listset[depth]) != RedBlackTree:
+        node = listset[depth + mdepth].get_top()
+    else:
+        node = listset[depth].get_max()
+    if node <
+"""
