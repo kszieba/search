@@ -126,6 +126,9 @@ class Heap_with_keys:
         #delets res from dictionary
         return res
     
+    def get_top(self):
+        return self.alist[0]
+    
     def remove(self, val):
         i = self.dct[val.key]
         res = self.alist[i]
