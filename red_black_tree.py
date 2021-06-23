@@ -243,6 +243,14 @@ class RedBlackTree():
         #print("popped max")
         self.length -=1        
         return res
+    
+    def get_max(self):
+        node = self.root
+        while node.right != self.TNULL:
+            node = node.right
+
+        res = node.data
+        return res
 
     # rotate left at node x
     def left_rotate(self, x):
