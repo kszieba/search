@@ -138,6 +138,13 @@ def push(listset, depth, mdepth, node):
         #except: print(depth, depth + mdepth, file=sys.stderr)
     else:
         listset[depth].insert(node)
+        
+def active_push(listset, depth, mdepth, node):
+    listset[depth].push(node)
+    listset[depth + mdepth].push(convertfromSNode(node.key, node.g, node.f))
+        
+def wait_push(listset, depth, mdepth, node):
+    listset[depth].insert(node)
 
 def popfirst(listset, depth, mdepth):
     if type(listset[depth]) != RedBlackTree:
@@ -157,8 +164,15 @@ def poplast(listset, depth, mdepth):
 def remove(listset, depth, mdepth, node):
     listset[depth].remove(node)
     listset[depth + mdepth].remove(node)
+    
+def check_node(listset, depth, mdepth, node, beam):
+    if len(listset[depth]) > beam:
+        cnode = listset[depth].get_max()
+        if node >= cnode:
+            return False
+    return True
 
-
+"""
 def check_node(listset, depth, mdepth, node, beam):
     if len(listset[depth]) > beam:
         if type(listset[depth]) != RedBlackTree:
@@ -168,3 +182,4 @@ def check_node(listset, depth, mdepth, node, beam):
         if node >= cnode:
             return False
     return True
+"""

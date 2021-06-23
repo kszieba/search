@@ -15,24 +15,40 @@ from red_black_tree import RedBlackTree
 
 from ibs_nodes import Node, push, popfirst, poplast, remove
 
+"""
 from guppy import hpy
 h = hpy()
 print(h.heap())
+"""
+
+
+class Results:
+    
+    def __init__(self):
+        self.expandcount = 0
+        self.gencount = 0
+        self.pruneddup = 0
+        self.reexpansions = 0
+        self.openlist_len = 1
+        self.waitlist_len = 0
+        self.closedlist_len = 0
+        self.max_openlist = 1
+        self.max_waitlist = 0 
+        self.max_closedlist = 0
 
 
 def gen_move_children(current, actBW, waitBW, openlist,
-    waitlist, closedlist, dep, mdepth, solution_c, data):
+    waitlist, closedlist, dep, mdepth, data, results):
     #print("Depth is " + str(dep))
-    genc = 0
     if dep == mdepth-1:
-        return genc
+        return
     childcollect = current.state.create_children (data)
     #print("Number of children is " + str(len(childcollect)))
     ndep = dep + 1
     for i in range(len(childcollect)):
         #print(i)
         c = Node (childcollect[i], current.g + 1, current, data)
-        genc += 1
+        results.gencount += 1
         inlist = False
         for i in range(mdepth): #altering this has serious effects
             if c in openlist[i]:
@@ -40,34 +56,47 @@ def gen_move_children(current, actBW, waitBW, openlist,
                 if c.g < openlist[i][c].g:
                     remove (openlist, i, mdepth, c)
                     push (openlist, ndep, mdepth, c)
+                else:
+                    results.pruneddup += 1
                 inlist = True
                 break
-            """
-            if c in waitlist[i]:
-                if c.g < waitlist[i][c].g:
-                    remove (waitlist, i, mdepth, c)
-                    push (openlist, ndep, mdepth, c)
-                inlist = True
-            """
             if c.key in closedlist[i]:
                 #print("Hi")
                 if c.g < closedlist[i][c.key].g:
                     closedlist[i].pop(c.key)
                     push (openlist, ndep, mdepth, c)
+                    results.closedlist_len -= 1
+                    results.openlist_len += 1
+                    results.reexpansions += 1
+                    if results.openlist_len > results.max_openlist:
+                        results.max_openlist = results.openlist_len
+                else:
+                    results.pruneddup += 1
                 inlist = True
                 break
         if not inlist:
             #print("Hello?")
             push (openlist, ndep, mdepth, c)
+            results.openlist_len += 1
+            if results.openlist_len > results.max_openlist:
+                results.max_openlist = results.openlist_len
         #print(inlist)
-        #if len(openlist[ndep]) + len(closedlist[ndep])-actBW
+        #if len(openlist[dep+1]) + len(closedlist[dep+1])-actBW
         if len(openlist[ndep]) > actBW:
             transfer = poplast(openlist, ndep, mdepth)
             push (waitlist, ndep, mdepth, transfer)
+            results.openlist_len -= 1
+            results.waitlist_len += 1
+            if results.waitlist_len > results.max_waitlist:
+                results.max_waitlist = results.waitlist_len
             if len(waitlist[ndep]) > waitBW:
                 poplast(waitlist, ndep, mdepth)
+                results.waitlist_len -= 1
                 #end of child generation code
-    return genc
+    #print("Gencount this time is " + str(genc))
+    #print(len(openlist[dep+1]), actBW)
+    #print(len(openlist[dep+1]) + len(closedlist[dep+1]) + len(waitlist[dep+1]))
+    return
 
 def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="standard"):
     openlist = [0 for i in range(mdepth * 2)]
@@ -77,7 +106,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
         openlist[i] = Heap_with_keys([])
         openlist[i + mdepth] = Heap_with_keys([])
         waitlist[i] = RedBlackTree()
-        closedlist[i] = {}   #corresponds to line 3
+        closedlist[i] = {}   #correspond to line 3
     solution_c = mdepth #substitute for infinity to avoid an unreasonably high number of digits
     goal = None
     goalcount = 0
@@ -87,13 +116,15 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
     push (openlist, 0, mdepth, initial)
     actBW = 1
     waitBW = bwidth - actBW
-    expandcount = 0
-    gencount = 0
+    results = Results()
     while True:
         for dep in range(mdepth):
             #print(dep)
             while openlist[dep]:
                 current = popfirst (openlist, dep, mdepth)
+                results.openlist_len -= 1
+                if results.openlist_len > results.max_openlist:
+                    results.max_openlist = results.openlist_len
                 if (current.f - current.g) == 0:
                     if current.f < solution_c:
                         solution_c = current.f
@@ -102,12 +133,16 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                         countlist.append(current.f)
                         beamlist.append(actBW)
                     closedlist[dep][current.key] = current
+                    results.closedlist_len += 1
+                    if results.closedlist_len > results.max_closedlist:
+                        results.max_closedlist = results.closedlist_len
                     #print(closedlist[dep])
                     continue
                 closedlist[dep][current.key] = current
-                gencount += gen_move_children(current, actBW, waitBW, openlist,
-    waitlist, closedlist, dep, mdepth, solution_c, data)
-                expandcount += 1
+                results.closedlist_len += 1
+                gen_move_children(current, actBW, waitBW, openlist,
+    waitlist, closedlist, dep, mdepth, data, results)
+                results.expandcount += 1
                 #print(closedlist[dep])
                 #print("Closed list length is " + str(len(closedlist[dep])))
                 #print("Active beamwidth is " + str(actBW))
@@ -121,6 +156,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                 #print(waitlist[dep2].length)
                 if waitlist[dep2]:
                     transfer = popfirst(waitlist, dep2, mdepth)
+                    results.waitlist_len -= 1
                     inlist = False
                     for i in range(mdepth): #altering this has serious effects
                         if transfer in openlist[i]:
@@ -128,25 +164,28 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                             if transfer.g < openlist[i][transfer].g:
                                 remove (openlist, i, mdepth, transfer)
                                 push (openlist, dep2, mdepth, transfer)
+                            else:
+                                results.pruneddup += 1
                             inlist = True
                             break
-                        """
-                        if c in waitlist[i]:
-                            if c.g < waitlist[i][c].g:
-                                remove (waitlist, i, mdepth, c)
-                                push (openlist, ndep, mdepth, c)
-                            inlist = True
-                        """
                         if transfer.key in closedlist[i]:
                             #print("Hi")
                             if transfer.g < closedlist[i][transfer.key].g:
                                 closedlist[i].pop(transfer.key)
-                                #print("insert depth is " + str(ndep))
                                 push (openlist, dep2, mdepth, transfer)
+                                results.closedlist_len -= 1
+                                results.openlist_len += 1
+                                if results.openlist_len > results.max_openlist:
+                                    results.max_openlist = results.openlist_len
+                            else:
+                                results.pruneddup += 1
                             inlist = True
                             break
                     if not inlist:
                         push(openlist, dep2, mdepth, transfer)
+                        results.openlist_len += 1
+                        if results.openlist_len > results.max_openlist:
+                            results.max_openlist = results.openlist_len
         else:
             print("File: " + filename)
             print("Beamwidth: " + str(bwidth))
@@ -164,8 +203,13 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                 print("Total goal count: " + str(goalcount))
                 print ("Costs were: " + str(countlist))
                 print("Beamwidths were:  " + str(beamlist))
-            print("Nodes expanded: " + str(expandcount))
-            print("Distinct nodes generated: " + str(gencount) + "\n")
+            print("Nodes expanded: " + str(results.expandcount))
+            print("Distinct nodes generated: " + str(results.gencount))
+            print("Pruned duplicates: " + str(results.pruneddup))
+            print("Re-expansions: " + str(results.reexpansions))
+            print("Max length of open list: " + str(results.max_openlist))
+            print("Max length of wait list: " + str(results.max_waitlist))
+            print("Max length of closed list: " + str(results.max_closedlist)  + "\n")
             """
             for i in range(len(openlist)):
                 print("For " + str(i))
@@ -193,10 +237,10 @@ if __name__=='__main__':
     arguments = PARSE.parse_args()
     #parses arguments
     if not arguments.i:
-        filename = "8_puzzles/1542"
+        filename = "korf100/12"
         domain = "sliding_tiles"
         width = 60
-        depth = 40
+        depth = 50
     else:
         filename = arguments.i
         if not os.path.exists("C:/Users/melis/" + arguments.i):
