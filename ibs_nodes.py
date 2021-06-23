@@ -158,11 +158,13 @@ def remove(listset, depth, mdepth, node):
     listset[depth].remove(node)
     listset[depth + mdepth].remove(node)
 
-"""
-def check_node(listset, depth, mdepth):
-    if type(listset[depth]) != RedBlackTree:
-        node = listset[depth + mdepth].get_top()
-    else:
-        node = listset[depth].get_max()
-    if node <
-"""
+
+def check_node(listset, depth, mdepth, node, beam):
+    if len(listset[depth]) > beam:
+        if type(listset[depth]) != RedBlackTree:
+            cnode = listset[depth + mdepth].get_top()
+        else:
+            cnode = listset[depth].get_max()
+        if node >= cnode:
+            return False
+    return True
