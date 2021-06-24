@@ -17,61 +17,54 @@ for i in range(1, 101):
 
 
 
-def plot_variable(inputfile, domain, c_type, plot_type, algor1=None, algor2=None):
+def plot_variable(input1, input2, plot_type):
+    inputf1 = input1.split("_")
+    inputf2 = input2.split("_")
     algorithms = ("ibs", "ibs_full_closed_list_variant", "ibs_katrina", "ibs_katrina_full_closed_list")
-    if c_type == "all":
-        algorlists = ([] for i in range(4))
-    elif c_type == "two":
-        algorlists = ([] for i in range(2))
-        two = []
-        algors = ("ibs", "ibs_fcl", "ibs_k", "ibs_kfcl")
-        for j in (4):
-            if algor1 == algors[j]:
-                two.append(algorithms[j])
-            if algor2 == algors[j]:
-                two.append(algorithms[j])
-            
-    linecount = 0
-    if domain == "sliding_tiles":
-        domainname = "Sliding Tiles"
-    else:
-        domainname = "Blocksworld"
-    plot_types = ("g_value", "expanded", "generated", "duplicates", 
+    plot_types = ("g_value", "goals_found", "expanded", "generated", "duplicates", 
                   "reexpansions","max_open", "max_wait", "max_closed")
+    inputs = [input1, input2]
     for i in range(len(plot_types)):
         if plot_types[i] == plot_type:
             break
-    rfile = open(inputfile, "r")
-    for line in rfile:
-        pieces = line.split(",")
-        if pieces[16] != "Yes":
-            if pieces[4] == domain:
-                if c_type == "all":
-                    if pieces[3] == "ibs":
-                        algorlists[0].append(int(pieces[i+8]))
-                    elif pieces[3] == "ibs_full_closed_list_variant":
-                        algorlists[1].append(int(pieces[i+8]))
-                    elif pieces[3] == "ibs_katrina":
-                        algorlists[2].append(int(pieces[i+8]))
-                    elif pieces[3] == "ibs_katrina_full_closed_list":
-                        algorlists[3].append(int(pieces[i+8]))
-                elif c_type == "two":
-                    if pieces[3] == two[0]:
-                        algorlists[0].append(int(pieces[i+8]))
-                    elif pieces[3] == two[1]:
-                        algorlists[1].append(int(pieces[i+8]))
-                linecount += 1
-    count = [0 for j in range(linecount//4)]
     beams = (10, 20, 40, 60, 80, 100)
-    for j in len(beams):
+    twolists =[[], []]
+    for j in range(2):
+        twolists[j] = [[] for i in range(len(beams))]
+        rfile = open(inputs[j], "r")
+        for line in rfile:
+            pieces = line.split(",")
+            if pieces[8] != "":
+                for k in range(len(beams)):
+                    if pieces[5] == str(beams[k]):
+                        twolists[j][k].append(int(pieces[i+8]))
+                        break
+        rfile.close()
+    count = [0 for j in range(len(beams))]
+    averagelist1 = [0 for j in range(len(beams))]
+    averagelist2 = [0 for j in range(len(beams))]
+    for j in range(len(beams)):
         count[j] = j
-    for algorithm in algorlists:
-        plt.plot(count, algorithm)
-    titlelist = plot_types = ["G-Value of Solution", "Nodes Expanded", 
+        averagelist1[j] = sum(twolists[0][j]) / len(twolists[0][j])
+        averagelist2[j] = sum(twolists[1][j]) / len(twolists[1][j])
+    if inputf1[-3] == "ibs":
+        label1 = "_".join(inputf1[-3:-1])
+    else:
+        label1 = inputf1[-2]
+    if inputf2[-3] == "ibs":
+        label2 = "_".join(inputf2[-3:-1])
+    else:
+        label2 = inputf2[-2]
+    plt.plot(beams, averagelist1, label=label1)
+    plt.plot(beams, averagelist2, label=label2)
+    titlelist = ["G-Value of Solution", "Number of Goals Found", "Nodes Expanded", 
             "Nodes Generated", "Duplicates Pruned", "Re-expansions", 
             "Maximum Size of Open List", "Maximum Size of Wait List"
             "Maximum Size of Closed List"]
-    plt.title("Plot of "+ titlelist[i] + " for " + domainname)
+    print(averagelist1)
+    print(averagelist2)
+    plt.title("Plot of "+ titlelist[i])
+    plt.legend()
     plt.show()
 
 def plot_data(inputfile, plot_type, domain):
@@ -80,27 +73,12 @@ def plot_data(inputfile, plot_type, domain):
 
 if __name__=='__main__':
     PARSE = argparse.ArgumentParser()
-    PARSE.add_argument("-i", help='input file path (shortened)', type=str)
-    PARSE.add_argument("-c", help='comparison type', type=str)
-    PARSE.add_argument("-t", help='plot type', type=str)
-    PARSE.add_argument("-d", help='domain', type=str)
-    PARSE.add_argument("-f", help='first algorithm', type=str, required=False)
-    PARSE.add_argument("-s", help='second algorithm', type=str, required=False)
+    PARSE.add_argument("-f", help='first file', type=str, required=False)
+    PARSE.add_argument("-s", help='second file', type=str, required=False)
+    PARSE.add_argument("-t", help='plot type', type=str, required=False)
     arguments = PARSE.parse_args()
-    if not arguments.i:
-        inputfile = "ibs_results2.csv"
-        plot_type = "time"
-        domain = "blocksworld"
-        c_type = "all"
-        plot_data (inputfile, c_type, plot_type, domain)
-    else:
-        inputfile = arguments.i
-        c_type = arguments.c
-        plot_type = arguments.t
-        domain = arguments.d
-        if c_type == "two":
-            algor1 = arguments.f
-            algor2 = arguments.s
-            plot_data (inputfile, c_type, plot_type, domain, algor1, algor2)
-        else:
-            plot_data (inputfile, c_type, plot_type, domain)
+    first_file = "New_Results/korf100_1_3_ibs_k_660.csv"
+    second_file = "New_Results/korf100_1_3_ibs_660.csv"
+    plot_type = "expanded"
+    plot_variable (first_file, second_file, plot_type)
+    #plot_variable (arguments.f, arguments.s, arguments.t)
