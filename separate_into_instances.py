@@ -19,7 +19,7 @@ def separate_into_instances (inputname, beamnumber):
     namelis = inputname.split("beam_set")
     stdout = sys.stdout
     wnames = []
-    rfile = open("New_Results/" + inputname, "r")
+    rfile = open("New_Results/Beam_Set_Files/" + inputname, "r")
     resultcount = 0
         #print(rname, file=sys.stderr)
     count = -1
@@ -35,6 +35,7 @@ def separate_into_instances (inputname, beamnumber):
             line1 = line
         elif found == 2:
             resultcount += 1
+            print("")
             wfile.close()
             if resultcount == beamnumber:
                 break
@@ -55,7 +56,7 @@ def separate_into_instances (inputname, beamnumber):
                             wfile = open("New_Results/Single_Results/" + wname, "w")
                             sys.stdout = wfile
                             print(line1, end="")
-                        print(line)
+                        print(line, end="")
                         correct = False
                         found += 1
                         collect = ""
