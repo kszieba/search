@@ -15,19 +15,24 @@ import os.path
 import cProfile
 import sys
 
-def run_experiments(algorithm, domain, depth, folder, start, tail):
+def run_experiments(algorithm, domain, depth, folder, start, tail, environ="normal"):
     if algorithm == "ibs":
         aname = "ibs"
     elif algorithm == "ibs_fcl":
         aname = "ibs_full_closed_list_variant"   
     elif algorithm == "ibs_k":
         aname = "ibs_katrina" 
-    else:
+    elif algorithm == "ibs_kfcl":
         aname = "ibs_katrina_full_closed_list" 
+    else:
+        aname = "ibs_katrina_max_depth_only"
     algor_file = __import__(aname)
     stdout = sys.stdout
     for i in range(start, tail + 1):
-        data, initstate = read_file("C:/Users/melis/" + folder + "/" + str(i))
+        if environ == "normal":
+            data, initstate = read_file("C:/Users/melis/" + folder + "/" + str(i))
+        else:
+            data, initstate = read_file(folder + "/" + str(i))
         beams = (10, 20, 40, 60, 80, 100)
         filepath = folder + "/" + str(i)
         for j in range(6):
@@ -47,9 +52,13 @@ if __name__=='__main__':
     PARSE.add_argument("-f", help='folder with problem set', type=str)
     PARSE.add_argument("-s", help='start of problem set', type=int)
     PARSE.add_argument("-t", help='tail of problem set', type=int)
+    PARSE.add_argument("-e", help='environment in which program is run', type=str, required=False)
     args = PARSE.parse_args()
     if args.d == "blocksworld":
         from blocksworld import read_file
     elif args.d == "sliding_tiles":
         from slidingtiles import read_file
-    run_experiments(args.a, args.d, args.b, args.f, args.s, args.t)
+    if not args.e:
+        run_experiments(args.a, args.d, args.b, args.f, args.s, args.t)
+    else:
+        run_experiments(args.a, args.d, args.b, args.f, args.s, args.t, args.e)
