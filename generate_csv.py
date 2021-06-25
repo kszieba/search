@@ -49,10 +49,8 @@ def generate_csv(algorithm, domain, depth, folder, start, tail):
                 if collected == 9:
                     print("", file=finalfile)
                     #print(i, " ", beams[k], file=sys.stderr)
-                    #only executing for the last file
                     break
                 elif count == lines_to_keep[collected]:
-                    #except for file 4, executing only when count == 4
                     for j in range(len(line)):
                         """
                         if i == 1:
@@ -65,7 +63,7 @@ def generate_csv(algorithm, domain, depth, folder, start, tail):
                             if line[j].isnumeric():
                                 collect += line[j]
                             elif line[j] == "\n":
-                                print(collect, end=",", file=finalfile) #only five printed in the file
+                                print(collect, end=",", file=finalfile)
                                 correct = False
                                 collected += 1
                                 collect = ""
