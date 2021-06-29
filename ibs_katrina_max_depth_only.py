@@ -154,7 +154,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                 closedlist[dep][current.key] = current
                 results.closedlist_len += 1
                 gen_move_children(current, actBW, waitBW, openlist,
-    waitlist, closedlist, dep, mdepth, solution_c, data, results)
+    waitlist, closedlist, dep, mdepth, data, results)
                 results.expandcount += 1
                 #print(closedlist[dep])
                 #print("Closed list length is " + str(len(closedlist[dep])))
