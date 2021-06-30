@@ -138,12 +138,12 @@ def read_file(inputfile):
 if __name__=='__main__':        
 #if called from the terminal
     filename = "10042"
-    if os.path.exists("C:/Users/melis/8_puzzles/8_puzzles/"+filename):
-        dimens, state = read_file("C:/Users/melis/8_puzzles/8_puzzles/"+filename)
+    if os.path.exists("C:/Users/melis/8_puzzles/"+filename):
+        dimens, state = read_file("C:/Users/melis/8_puzzles/"+filename)
         #dimens, locations = read_file("C:/Users/melis/8_puzzles/8_puzzles/"+filename)
         #state = State (dimens, locations)
-        state._locationlist = [1, 2, 3, 4, 0, 6, 7, 8, 5]
-        state._0location = 4
+        #state._locationlist = [1, 2, 3, 4, 0, 6, 7, 8, 5]
+        #state._0location = 4
         state.print_information(dimens)
         print("Children's Information\n")
         childrenlist = state.create_children(dimens)

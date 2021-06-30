@@ -54,8 +54,6 @@ def gen_move_children(current, actBW, waitBW, openlist,
         c = Node (childcollect[i], current.g + 1, current, data)
         results.gencount += 1
         inlist = False
-        if c.f >= solution_c: #very useful
-            continue
         for i in range(solution_c): #altering this has serious effects
             if c in openlist[i]:
                 if c.g < openlist[i][c].g:
@@ -136,7 +134,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                 results.openlist_len -= 1
                 if results.openlist_len > results.max_openlist:
                     results.max_openlist = results.openlist_len
-                if current.f >= solution_c:
+                if dep >= solution_c:
                     continue
                 if (current.f - current.g) == 0:
                     if current.f < solution_c:
