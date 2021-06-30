@@ -8,7 +8,6 @@ Created on Tue Jun  8 13:47:52 2021
 import os.path
 import argparse
 import sys
-from collections import OrderedDict
 
 from heap_with_keys import Heap_with_keys
 
@@ -109,7 +108,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
         openlist[i] = Heap_with_keys([])
         openlist[i + mdepth] = Heap_with_keys([])
         waitlist[i] = RedBlackTree()
-        closedlist[i] = OrderedDict()   #correspond to line 3
+        closedlist[i] = {}   #correspond to line 3
     solution_c = mdepth #substitute for infinity to avoid an unreasonably high number of digits
     goal = None
     goalcount = 0
@@ -134,6 +133,7 @@ def search_algorithm (filename, startstate, data, bwidth, mdepth, call_type="sta
                     if current.f < solution_c:
                         solution_c = current.f
                         goal = current
+                        print(dep)
                         goalcount += 1
                         countlist.append(current.f)
                         beamlist.append(actBW)
